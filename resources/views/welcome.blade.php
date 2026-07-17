@@ -25,7 +25,7 @@
     @livewireStyles
 </head>
 
-<body class="bg-[#f0f2f5] m-0 p-4 md:p-10 font-sans" x-data>
+<body class="bg-[#f0f2f5] m-0 p-4 md:p-10 font-sans">
     <div class="max-w-7xl mx-auto">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
             <div>
@@ -34,7 +34,7 @@
                     güncellenecek.</p>
             </div>
 
-            <button @click="$dispatch('open-cart')"
+            <button onclick="window.dispatchEvent(new CustomEvent('open-cart'))"
                 class="w-full sm:w-auto bg-brand-gold hover:bg-[#735738] text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-md flex justify-center items-center gap-2">
                 <i class="fa-solid fa-basket-shopping"></i> <span>Sepetimi Gör</span>
             </button>
@@ -47,8 +47,7 @@
                     <h3 class="text-lg font-semibold text-gray-800 m-0 mb-1">Adana Kebap</h3>
                     <p class="text-xl font-bold text-red-500 m-0 mb-4">280 TL</p>
                 </div>
-                <button
-                    onclick="window.dispatchEvent(new CustomEvent('open-cart')); Livewire.dispatch('add-to-cart', { id: 1, name: 'Adana Kebap', price: 280 })"
+                <button onclick="Livewire.dispatch('add-to-cart', { id: 1, name: 'Adana Kebap', price: 280 })"
                     class="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-bold transition-colors">
                     Sepete Ekle
                 </button>
@@ -60,8 +59,7 @@
                     <h3 class="text-lg font-semibold text-gray-800 m-0 mb-1">Lahmacun</h3>
                     <p class="text-xl font-bold text-red-500 m-0 mb-4">80 TL</p>
                 </div>
-                <button
-                    onclick="window.dispatchEvent(new CustomEvent('open-cart')); Livewire.dispatch('add-to-cart', { id: 2, name: 'Lahmacun', price: 80 })"
+                <button onclick="Livewire.dispatch('add-to-cart', { id: 2, name: 'Lahmacun', price: 80 })"
                     class="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-bold transition-colors">
                     Sepete Ekle
                 </button>
@@ -73,8 +71,7 @@
                     <h3 class="text-lg font-semibold text-gray-800 m-0 mb-1">Şalgam Suyu</h3>
                     <p class="text-xl font-bold text-red-500 m-0 mb-4">35 TL</p>
                 </div>
-                <button
-                    onclick="window.dispatchEvent(new CustomEvent('open-cart')); Livewire.dispatch('add-to-cart', { id: 3, name: 'Şalgam Suyu', price: 35 })"
+                <button onclick="Livewire.dispatch('add-to-cart', { id: 3, name: 'Şalgam Suyu', price: 35 })"
                     class="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-bold transition-colors">
                     Sepete Ekle
                 </button>

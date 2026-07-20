@@ -34,10 +34,17 @@
                     güncellenecek.</p>
             </div>
 
-            <button onclick="window.dispatchEvent(new CustomEvent('open-cart'))"
-                class="w-full sm:w-auto bg-brand-gold hover:bg-[#735738] text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-md flex justify-center items-center gap-2">
-                <i class="fa-solid fa-basket-shopping"></i> <span>Sepetimi Gör</span>
-            </button>
+            <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                <a href="/manager" target="_blank"
+                    class="w-full sm:w-auto bg-slate-800 hover:bg-slate-900 text-white px-5 py-3 rounded-xl font-bold transition-colors shadow-md flex justify-center items-center gap-2 text-sm">
+                    <i class="fa-solid fa-desktop text-amber-400"></i> <span>Yönetici Paneli</span>
+                </a>
+
+                <button onclick="window.dispatchEvent(new CustomEvent('open-cart'))"
+                    class="w-full sm:w-auto bg-brand-gold hover:bg-[#735738] text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-md flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-basket-shopping"></i> <span>Sepetimi Gör</span>
+                </button>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">

@@ -47,48 +47,56 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            <div
-                class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between transition-transform hover:-translate-y-1">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-800 m-0 mb-1">Adana Kebap</h3>
-                    <p class="text-xl font-bold text-red-500 m-0 mb-4">280 TL</p>
-                </div>
-                <button onclick="Livewire.dispatch('add-to-cart', { id: 1, name: 'Adana Kebap', price: 280 })"
-                    class="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-bold transition-colors">
-                    Sepete Ekle
-                </button>
-            </div>
-
-            <div
-                class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between transition-transform hover:-translate-y-1">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-800 m-0 mb-1">Lahmacun</h3>
-                    <p class="text-xl font-bold text-red-500 m-0 mb-4">80 TL</p>
-                </div>
-                <button onclick="Livewire.dispatch('add-to-cart', { id: 2, name: 'Lahmacun', price: 80 })"
-                    class="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-bold transition-colors">
-                    Sepete Ekle
-                </button>
-            </div>
-
-            <div
-                class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between transition-transform hover:-translate-y-1">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-800 m-0 mb-1">Şalgam Suyu</h3>
-                    <p class="text-xl font-bold text-red-500 m-0 mb-4">35 TL</p>
-                </div>
-                <button onclick="Livewire.dispatch('add-to-cart', { id: 3, name: 'Şalgam Suyu', price: 35 })"
-                    class="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-bold transition-colors">
-                    Sepete Ekle
-                </button>
-            </div>
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
         </div>
     </div>
 
     <livewire:cart-drawer />
 
     @livewireScripts
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/api/products')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const grid = document.getElementById('products-grid');
+                        grid.innerHTML = '';
+
+                        data.data.forEach(product => {
+                            let imgPath = product.image_url || product.image || '';
+                            if (imgPath && !imgPath.startsWith('/') && !imgPath.startsWith('http')) {
+                                imgPath = '/' + imgPath;
+                            }
+
+                            const imageHtml = imgPath
+                                ? `<img src="${imgPath}" alt="${product.name}" class="w-full h-48 object-cover rounded-t-lg mb-4">`
+                                : `<div class="w-full h-48 bg-gray-100 rounded-t-lg mb-4 flex items-center justify-center text-gray-400"><i class="fa-solid fa-image text-3xl"></i></div>`;
+
+                            const descHtml = product.description
+                                ? `<p class="text-gray-500 text-sm mb-3 line-clamp-2">${product.description}</p>`
+                                : '';
+
+                            grid.innerHTML += `
+                                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between transition-transform hover:-translate-y-1 h-full">
+                                    <div>
+                                        ${imageHtml}
+                                        <h3 class="text-lg font-semibold text-gray-800 m-0 mb-1">${product.name}</h3>
+                                        ${descHtml}
+                                        <p class="text-xl font-bold text-red-500 m-0 mb-4">${product.price} TL</p>
+                                    </div>
+                                    <button onclick="Livewire.dispatch('add-to-cart', { id: ${product.id}, name: '${product.name.replace(/'/g, "\\'")}', price: ${product.price} })" class="w-full py-3 mt-auto bg-green-500 hover:bg-green-600 text-white rounded-lg font-bold transition-colors">
+                                        Sepete Ekle
+                                    </button>
+                                </div>
+                            `;
+                        });
+                    }
+                })
+                .catch(error => console.error(error));
+        });
+    </script>
 </body>
 
 </html>

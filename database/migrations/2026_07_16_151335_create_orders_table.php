@@ -7,17 +7,19 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
-            $table->id();
-            $table->string('table_number')->default('Bilinmiyor');
-            $table->decimal('total_amount', 10, 2);
-            $table->boolean('cutlery_requested')->default(false);
-            $table->string('payment_method')->default('cash');
-            $table->string('coupon_code')->nullable();
-            $table->text('order_note')->nullable();
-            $table->string('status')->default('pending');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('orders')) {
+            Schema::create('orders', function (Blueprint $table) {
+                $table->id();
+                $table->string('table_number')->default('Bilinmiyor');
+                $table->decimal('total_amount', 10, 2);
+                $table->boolean('cutlery_requested')->default(false);
+                $table->string('payment_method')->default('cash');
+                $table->string('coupon_code')->nullable();
+                $table->text('order_note')->nullable();
+                $table->string('status')->default('pending');
+                $table->timestamps();
+            });
+        }
     }
 
     public function down(): void

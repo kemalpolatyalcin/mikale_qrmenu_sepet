@@ -6,6 +6,7 @@ use Livewire\Attributes\Url;
 use Darryldecode\Cart\Facades\CartFacade as Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Table;
 
 new class extends Component {
     #[Url(as: 'masa')]
@@ -13,9 +14,7 @@ new class extends Component {
 
     public $wantsCutlery = false;
     public $paymentMethod = 'cash';
-    public $couponCode = '';
     public $orderNote = '';
-    public $discount = 0;
     public $prepTime = 25;
 
     #[On('cartUpdated')]
@@ -76,19 +75,8 @@ new class extends Component {
     public function clearCart()
     {
         Cart::clear();
-        $this->discount = 0;
-        $this->couponCode = '';
         $this->orderNote = '';
         $this->dispatch('cartUpdated');
-    }
-
-    public function applyCoupon()
-    {
-        if (strtoupper($this->couponCode) === 'INDIRIM10') {
-            $this->discount = 10;
-        } else {
-            $this->discount = 0;
-        }
     }
 
     public function checkout()
@@ -97,17 +85,12 @@ new class extends Component {
             return;
         }
 
-        $finalTotal = Cart::getTotal() - $this->discount;
-        if ($finalTotal < 0) {
-            $finalTotal = 0;
-        }
-
         $order = Order::create([
             'table_number' => $this->tableNumber,
-            'total_amount' => $finalTotal,
+            'total_amount' => Cart::getTotal(),
             'cutlery_requested' => $this->wantsCutlery,
             'payment_method' => $this->paymentMethod,
-            'coupon_code' => $this->discount > 0 ? strtoupper($this->couponCode) : null,
+            'coupon_code' => null,
             'order_note' => $this->orderNote,
             'status' => 'pending',
         ]);
@@ -125,9 +108,7 @@ new class extends Component {
         Cart::clear();
         $this->wantsCutlery = false;
         $this->paymentMethod = 'cash';
-        $this->couponCode = '';
         $this->orderNote = '';
-        $this->discount = 0;
 
         $this->dispatch('cartUpdated');
         $this->dispatch('close-cart');
@@ -136,9 +117,19 @@ new class extends Component {
 
     public function with(): array
     {
+        $tableName = 'Bilinmeyen Masa';
+        if ($this->tableNumber && $this->tableNumber !== 'Bilinmeyen Masa') {
+            $table = Table::where('token', $this->tableNumber)->first();
+            if ($table) {
+                $tableName = $table->name;
+            } else {
+                $tableName = $this->tableNumber;
+            }
+        }
         return [
             'cartItems' => Cart::getContent()->sortBy('id'),
             'cartTotal' => Cart::getTotal(),
+            'tableName' => $tableName,
         ];
     }
 };
@@ -162,7 +153,7 @@ new class extends Component {
         </div>
 
         <div :class="open ? 'translate-x-0' : 'translate-x-full'"
-            class="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-brand-bg shadow-2xl z-[100] transform transition-transform duration-300 ease-in-out flex flex-col font-sans">
+            class="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-brand-bg shadow-2xl z-[100] transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col font-sans">
 
             <div class="flex flex-col bg-white border-b border-gray-100 shrink-0">
                 <div class="flex justify-between items-center px-6 py-5">
@@ -184,7 +175,7 @@ new class extends Component {
                         <span>Tahmini Süre: {{ $prepTime }} - {{ $prepTime + 10 }} dk</span>
                     </div>
                     <div class="bg-amber-100 px-2 py-1 rounded text-xs font-bold border border-amber-200">
-                        {{ $tableNumber }}
+                        {{ $tableName }}
                     </div>
                 </div>
             </div>
@@ -257,34 +248,6 @@ new class extends Component {
                                 placeholder="Sipariş notunuz (Örn: Soğansız olsun, az pişsin...)"
                                 class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-gold resize-none h-20 bg-gray-50"></textarea>
                         </div>
-
-                        <div class="border-t border-gray-100 pt-4">
-                            <span class="text-sm font-bold text-gray-700 block mb-2">Ödeme Yöntemi</span>
-                            <div class="flex gap-4">
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" wire:model.live="paymentMethod" value="cash" name="payment"
-                                        class="w-4 h-4 text-brand-gold focus:ring-brand-gold">
-                                    <span class="text-sm text-gray-600 font-medium">Nakit</span>
-                                </label>
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" wire:model.live="paymentMethod" value="card" name="payment"
-                                        class="w-4 h-4 text-brand-gold focus:ring-brand-gold">
-                                    <span class="text-sm text-gray-600 font-medium">Kredi Kartı</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="border-t border-gray-100 pt-4">
-                            <div class="flex gap-2">
-                                <input type="text" wire:model="couponCode" placeholder="Kupon Kodu"
-                                    class="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-gold bg-gray-50">
-                                <button wire:click="applyCoupon"
-                                    class="bg-gray-800 hover:bg-black text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors">Uygula</button>
-                            </div>
-                            @if($discount > 0)
-                                <span class="text-xs font-bold text-green-500 mt-2 block">Kupon uygulandı!</span>
-                            @endif
-                        </div>
                     </div>
                 @endif
             </div>
@@ -292,20 +255,10 @@ new class extends Component {
             @if(!$cartItems->isEmpty())
                 <div class="p-6 bg-white border-t border-gray-100 shrink-0 shadow-[0_-5px_15px_rgba(0,0,0,0.02)]">
                     <div class="flex flex-col gap-2 mb-4">
-                        <div class="flex justify-between text-gray-500 text-sm font-medium">
-                            <span>Ara Toplam:</span>
-                            <span>{{ $cartTotal }} TL</span>
-                        </div>
-                        @if($discount > 0)
-                            <div class="flex justify-between text-green-500 text-sm font-bold">
-                                <span>İndirim:</span>
-                                <span>-{{ $discount }} TL</span>
-                            </div>
-                        @endif
                         <div
                             class="flex justify-between font-bold text-xl text-brand-text mt-2 pt-2 border-t border-gray-100">
                             <span>Ödenecek Tutar:</span>
-                            <span class="text-brand-gold">{{ max(0, $cartTotal - $discount) }} TL</span>
+                            <span class="text-brand-gold">{{ $cartTotal }} TL</span>
                         </div>
                     </div>
 

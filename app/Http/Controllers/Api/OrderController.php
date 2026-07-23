@@ -19,6 +19,10 @@ class OrderController
     public function placeOrder(Request $request)
     {
         $tableNumber = $request->input('table_number') ?? $request->input('table_name') ?? 'Bilinmiyor';
+        $table = \App\Models\Table::where('token', $tableNumber)->first();
+        if ($table) {
+            $tableNumber = $table->name;
+        }
         $totalAmount = $request->input('total_amount') ?? $request->input('total_price') ?? 0;
 
         $request->validate([

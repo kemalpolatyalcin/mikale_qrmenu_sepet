@@ -54,6 +54,13 @@
                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data={{ urlencode(url('/?masa=' . $table->token)) }}" alt="QR Code" class="w-[120px] h-[120px]">
                     </div>
 
+                    <form action="{{ route('admin.tables.reset', $table->id) }}" method="POST" class="w-full mb-3">
+                        @csrf
+                        <button type="submit" class="w-full bg-amber-50 hover:bg-[#8C6C47] text-[#8C6C47] hover:text-white border border-amber-100 rounded-xl py-2 text-xs font-semibold transition-all">
+                            <i class="fa-solid fa-rotate mr-1"></i> Masayı Sıfırla (Çıkış)
+                        </button>
+                    </form>
+
                     <a href="{{ url('/?masa=' . $table->token) }}" target="_blank"
                         class="text-xs font-medium text-[#8C6C47] hover:underline flex items-center gap-1">
                         <i class="fa-solid fa-link"></i> Linki Test Et

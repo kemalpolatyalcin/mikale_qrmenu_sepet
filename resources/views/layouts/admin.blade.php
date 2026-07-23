@@ -37,10 +37,10 @@
 
         <header
             class="md:hidden h-16 w-full bg-white border-b border-gray-100 px-6 flex items-center justify-between shrink-0 z-20">
-            <div class="font-allison text-4xl text-black pt-1 sidebar-restaurant-letter">{{ substr($siteSettings['restaurant_name'] ?? 'M', 0, 1) }}</div>
-            <button id="mobileMenuBtn" onclick="document.getElementById('mobile-admin-menu').classList.remove('translate-x-full')" class="text-gray-800 p-2 hover:bg-gray-50 rounded-lg transition-colors">
+            <button id="mobileMenuBtn" onclick="document.getElementById('mobile-admin-menu').classList.remove('-translate-x-full')" class="text-gray-800 p-2 hover:bg-gray-50 rounded-lg transition-colors">
                 <i class="fa-solid fa-bars text-xl"></i>
             </button>
+            <div class="font-allison text-4xl text-black pt-1 sidebar-restaurant-letter">{{ isset($activeRestaurant) ? substr($activeRestaurant->name, 0, 1) : (substr($siteSettings['restaurant_name'] ?? 'M', 0, 1)) }}</div>
         </header>
 
         <header

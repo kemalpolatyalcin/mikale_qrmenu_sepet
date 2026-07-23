@@ -234,8 +234,12 @@
                 <button onclick="switchView('home')" class="hover:text-brand-gold transition-colors">Ana Sayfa</button>
                 <button onclick="switchView('search')" class="hover:text-brand-gold transition-colors">Menü</button>
                 <button onclick="window.dispatchEvent(new CustomEvent('open-cart'))"
-                    class="hover:text-brand-gold transition-colors flex items-center gap-1.5">
-                    <i class="fa-solid fa-basket-shopping"></i> <span>Sepet</span>
+                    class="hover:text-brand-gold transition-colors flex items-center gap-1.5 relative">
+                    <i class="fa-solid fa-basket-shopping"></i>
+                    <span>Sepet</span>
+                    <span id="cart-count-badge" class="absolute -top-2 -right-3 bg-red-500 text-white rounded-full text-[9px] min-w-[16px] h-4 flex items-center justify-center font-bold px-1 {{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') > 0 ? '' : 'hidden' }}">
+                        {{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') }}
+                    </span>
                 </button>
                 <a href="/admin" target="_blank"
                     class="hover:text-brand-gold transition-colors flex items-center gap-1.5">
@@ -444,8 +448,12 @@
                 <i class="fa-solid fa-magnifying-glass text-lg mb-0.5"></i><span data-i18n="navSearch">Menü</span>
             </button>
             <button onclick="window.dispatchEvent(new CustomEvent('open-cart'))"
-                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-gray-500 w-1/5">
-                <i class="fa-solid fa-basket-shopping text-lg mb-0.5"></i><span>Sepet</span>
+                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-gray-500 w-1/5 relative">
+                <i class="fa-solid fa-basket-shopping text-lg mb-0.5"></i>
+                <span>Sepet</span>
+                <span id="mobile-cart-count-badge" class="absolute top-2 right-6 bg-red-500 text-white rounded-full text-[8px] min-w-[14px] h-3.5 flex items-center justify-center font-bold px-0.5 {{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') > 0 ? '' : 'hidden' }}">
+                    {{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') }}
+                </span>
             </button>
             <button onclick="window.open('/admin/orders', '_blank')"
                 class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-gray-500 w-1/5">
@@ -504,6 +512,30 @@
 
     <script>
         const currencySymbol = "{{ $siteSettings['currency'] ?? '₺' }}";
+
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('cart-updated', (event) => {
+                let count = 0;
+                if (event && typeof event === 'object') {
+                    if (event.count !== undefined) {
+                        count = event.count;
+                    } else if (Array.isArray(event) && event[0] && event[0].count !== undefined) {
+                        count = event[0].count;
+                    } else if (event.detail && event.detail.count !== undefined) {
+                        count = event.detail.count;
+                    }
+                }
+                const badges = document.querySelectorAll('#cart-count-badge, #mobile-cart-count-badge');
+                badges.forEach(badge => {
+                    if (count > 0) {
+                        badge.innerText = count;
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                });
+            });
+        });
 
         const translations = {
             tr: {

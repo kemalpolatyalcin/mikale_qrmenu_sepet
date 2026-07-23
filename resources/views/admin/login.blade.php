@@ -85,6 +85,12 @@
                         class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#8C6C47] focus:border-[#8C6C47] outline-none transition-all text-sm">
                 </div>
 
+                <div class="flex items-center">
+                    <input type="checkbox" id="is_developer" name="is_developer" value="1"
+                        class="h-4 w-4 rounded border-gray-300 text-[#8C6C47] focus:ring-[#8C6C47] cursor-pointer">
+                    <label for="is_developer" class="ml-2 block text-sm font-medium text-gray-600 cursor-pointer">Geliştirici Girişi (Developer Login)</label>
+                </div>
+
                 <button type="submit" data-i18n="loginBtn"
                     class="w-full bg-[#1C1C1C] text-white font-medium py-3.5 rounded-xl hover:bg-[#8C6C47] transition-colors mt-4 shadow-md">
                     Giriş Yap

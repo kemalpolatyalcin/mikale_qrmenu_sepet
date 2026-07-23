@@ -17,7 +17,7 @@ new class extends Component {
     public $orderNote = '';
     public $prepTime = 25;
 
-    #[On('cartUpdated')]
+    #[On('cart-updated')]
     public function refreshCart()
     {
     }
@@ -32,7 +32,7 @@ new class extends Component {
             'quantity' => 1,
             'attributes' => []
         ]);
-        $this->dispatch('cartUpdated');
+        $this->dispatch('cart-updated', count: Cart::getContent()->sum('quantity'));
         $this->dispatch('open-cart');
     }
 
@@ -45,7 +45,7 @@ new class extends Component {
             'quantity' => 1,
             'attributes' => []
         ]);
-        $this->dispatch('cartUpdated');
+        $this->dispatch('cart-updated', count: Cart::getContent()->sum('quantity'));
     }
 
     public function updateQuantity($id, $action)
@@ -63,20 +63,20 @@ new class extends Component {
                 Cart::update($id, ['quantity' => -1]);
             }
         }
-        $this->dispatch('cartUpdated');
+        $this->dispatch('cart-updated', count: Cart::getContent()->sum('quantity'));
     }
 
     public function removeItem($rowId)
     {
         Cart::remove($rowId);
-        $this->dispatch('cartUpdated');
+        $this->dispatch('cart-updated', count: Cart::getContent()->sum('quantity'));
     }
 
     public function clearCart()
     {
         Cart::clear();
         $this->orderNote = '';
-        $this->dispatch('cartUpdated');
+        $this->dispatch('cart-updated', count: Cart::getContent()->sum('quantity'));
     }
 
     public function checkout()
@@ -85,8 +85,18 @@ new class extends Component {
             return;
         }
 
+        $tableName = 'Bilinmeyen Masa';
+        if ($this->tableNumber && $this->tableNumber !== 'Bilinmeyen Masa') {
+            $table = Table::where('token', $this->tableNumber)->first();
+            if ($table) {
+                $tableName = $table->name;
+            } else {
+                $tableName = $this->tableNumber;
+            }
+        }
+
         $order = Order::create([
-            'table_number' => $this->tableNumber,
+            'table_number' => $tableName,
             'total_amount' => Cart::getTotal(),
             'cutlery_requested' => $this->wantsCutlery,
             'payment_method' => $this->paymentMethod,
@@ -110,7 +120,7 @@ new class extends Component {
         $this->paymentMethod = 'cash';
         $this->orderNote = '';
 
-        $this->dispatch('cartUpdated');
+        $this->dispatch('cart-updated', count: Cart::getContent()->sum('quantity'));
         $this->dispatch('close-cart');
         $this->dispatch('order-success');
     }
@@ -152,8 +162,8 @@ new class extends Component {
             class="fixed inset-0 bg-black/50 z-[90] backdrop-blur-sm cursor-pointer">
         </div>
 
-        <div :class="open ? 'translate-x-0' : 'translate-x-full'"
-            class="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-brand-bg shadow-2xl z-[100] transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col font-sans">
+        <div :class="open ? 'translate-x-0' : '-translate-x-full sm:translate-x-full'"
+            class="fixed top-0 left-0 sm:left-auto sm:right-0 h-full w-full sm:w-[450px] bg-brand-bg shadow-2xl z-[100] transform -translate-x-full sm:translate-x-full transition-transform duration-300 ease-in-out flex flex-col font-sans">
 
             <div class="flex flex-col bg-white border-b border-gray-100 shrink-0">
                 <div class="flex justify-between items-center px-6 py-5">

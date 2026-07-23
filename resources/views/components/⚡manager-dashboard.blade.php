@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use App\Models\Order;
+use App\Models\Restaurant;
 
 new class extends Component {
     public $filterStatus = 'all';
@@ -10,12 +11,26 @@ new class extends Component {
     public $lastOrderCount = 0;
     public $hasNewOrder = false;
 
+    protected function resetTableSessionByOrder($order)
+    {
+        if ($order && $order->table_number) {
+            $table = \App\Models\Table::where('name', $order->table_number)->first();
+            if ($table) {
+                $table->active_session_id = \Illuminate\Support\Str::random(40);
+                $table->save();
+            }
+        }
+    }
+
     public function updateStatus($orderId, $newStatus)
     {
         $order = Order::find($orderId);
         if ($order) {
             $order->status = $newStatus;
             $order->save();
+            if ($newStatus === 'ready' || $newStatus === 'completed') {
+                $this->resetTableSessionByOrder($order);
+            }
         }
     }
 
@@ -23,6 +38,7 @@ new class extends Component {
     {
         $order = Order::find($orderId);
         if ($order) {
+            $this->resetTableSessionByOrder($order);
             $order->delete();
         }
         if ($this->selectedOrderId === $orderId) {
@@ -47,7 +63,13 @@ new class extends Component {
 
     public function with(): array
     {
-        $query = Order::with('items')->latest();
+        $restaurantId = session('active_restaurant_id');
+        if (!$restaurantId) {
+            $first = Restaurant::first();
+            $restaurantId = $first ? $first->id : null;
+        }
+
+        $query = Order::with('items')->where('restaurant_id', $restaurantId)->latest();
 
         if ($this->filterStatus !== 'all') {
             $query->where('status', $this->filterStatus);

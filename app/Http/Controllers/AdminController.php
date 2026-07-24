@@ -431,4 +431,23 @@ class AdminController extends Controller
         $table->save();
         return redirect()->back()->with('success', 'Masa oturumu sıfırlandı.');
     }
+
+    public function checkNewOrders(Request $request)
+    {
+        $restaurantId = $this->getActiveRestaurantId();
+        $latestOrder = \App\Models\Order::where('restaurant_id', $restaurantId)->latest('id')->first();
+        $hasNew = false;
+        if ($latestOrder) {
+            if (!session()->has('last_checked_order_id')) {
+                session(['last_checked_order_id' => $latestOrder->id]);
+            } else {
+                $lastCheckedId = session('last_checked_order_id', 0);
+                if ($latestOrder->id > $lastCheckedId) {
+                    $hasNew = true;
+                    session(['last_checked_order_id' => $latestOrder->id]);
+                }
+            }
+        }
+        return response()->json(['has_new' => $hasNew]);
+    }
 }

@@ -86,18 +86,18 @@ new class extends Component {
 
         $orders = $query->get();
 
-        $currentCount = Order::count();
+        $currentCount = Order::where('restaurant_id', $restaurantId)->count();
         if ($this->lastOrderCount > 0 && $currentCount > $this->lastOrderCount) {
             $this->hasNewOrder = true;
         }
         $this->lastOrderCount = $currentCount;
 
         $stats = [
-            'total_today' => Order::whereDate('created_at', today())->count(),
-            'pending' => Order::where('status', 'pending')->count(),
-            'preparing' => Order::where('status', 'preparing')->count(),
-            'ready' => Order::where('status', 'ready')->count(),
-            'revenue_today' => Order::whereDate('created_at', today())->whereNotIn('status', ['cancelled'])->sum('total_amount'),
+            'total_today' => Order::where('restaurant_id', $restaurantId)->whereDate('created_at', today())->count(),
+            'pending' => Order::where('restaurant_id', $restaurantId)->where('status', 'pending')->count(),
+            'preparing' => Order::where('restaurant_id', $restaurantId)->where('status', 'preparing')->count(),
+            'ready' => Order::where('restaurant_id', $restaurantId)->where('status', 'ready')->count(),
+            'revenue_today' => Order::where('restaurant_id', $restaurantId)->whereDate('created_at', today())->whereNotIn('status', ['cancelled'])->sum('total_amount'),
         ];
 
         $selectedOrder = $this->selectedOrderId ? Order::with('items')->find($this->selectedOrderId) : null;

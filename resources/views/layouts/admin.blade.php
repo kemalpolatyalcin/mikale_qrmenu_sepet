@@ -75,5 +75,76 @@
 
     @include('admin.partials.mobile-menu')
 
+    <script>
+        (function() {
+            let audioCtx = null;
+            function unlock() {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume().then(() => {
+                        let osc = audioCtx.createOscillator();
+                        let gain = audioCtx.createGain();
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                        osc.start(audioCtx.currentTime);
+                        osc.stop(audioCtx.currentTime + 0.01);
+                    });
+                }
+                window.removeEventListener('click', unlock);
+                window.removeEventListener('keydown', unlock);
+                window.removeEventListener('touchstart', unlock);
+            }
+            window.addEventListener('click', unlock);
+            window.addEventListener('keydown', unlock);
+            window.addEventListener('touchstart', unlock);
+
+            function playSound() {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                audioCtx.resume().then(() => {
+                    try {
+                        let osc1 = audioCtx.createOscillator();
+                        let osc2 = audioCtx.createOscillator();
+                        let gain1 = audioCtx.createGain();
+                        let gain2 = audioCtx.createGain();
+                        osc1.connect(gain1);
+                        gain1.connect(audioCtx.destination);
+                        osc1.type = 'sine';
+                        osc1.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                        gain1.gain.setValueAtTime(0, audioCtx.currentTime);
+                        gain1.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05);
+                        gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.0);
+                        osc2.connect(gain2);
+                        gain2.connect(audioCtx.destination);
+                        osc2.type = 'sine';
+                        osc2.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.2);
+                        gain2.gain.setValueAtTime(0, audioCtx.currentTime + 0.2);
+                        gain2.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.25);
+                        gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.0);
+                        osc1.start(audioCtx.currentTime);
+                        osc1.stop(audioCtx.currentTime + 1.0);
+                        osc2.start(audioCtx.currentTime + 0.2);
+                        osc2.stop(audioCtx.currentTime + 1.0);
+                    } catch(e) {}
+                });
+            }
+
+            function checkNewOrders() {
+                fetch('/admin/api/new-orders-check')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.has_new) {
+                            playSound();
+                        }
+                    })
+                    .catch(err => {});
+            }
+            setInterval(checkNewOrders, 5000);
+        })();
+    </script>
 </body>
 </html>

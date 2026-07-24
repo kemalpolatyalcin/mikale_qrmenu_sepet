@@ -20,8 +20,14 @@ class OrderController
     {
         $tableNumber = $request->input('table_number') ?? $request->input('table_name') ?? 'Bilinmiyor';
         $table = \App\Models\Table::where('token', $tableNumber)->first();
+        $restaurantId = null;
         if ($table) {
             $tableNumber = $table->name;
+            $restaurantId = $table->restaurant_id;
+        }
+        if (!$restaurantId) {
+            $default = \App\Models\Restaurant::first();
+            $restaurantId = $default ? $default->id : null;
         }
         $totalAmount = $request->input('total_amount') ?? $request->input('total_price') ?? 0;
 
@@ -38,7 +44,8 @@ class OrderController
             'payment_method' => $request->input('payment_method', 'cash'),
             'coupon_code' => $request->input('coupon_code'),
             'order_note' => $request->input('order_note') ?? $request->input('notes'),
-            'status' => 'pending'
+            'status' => 'pending',
+            'restaurant_id' => $restaurantId
         ]);
 
         foreach ($request->items as $item) {

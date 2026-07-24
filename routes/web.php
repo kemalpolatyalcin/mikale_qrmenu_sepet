@@ -80,6 +80,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::post('/tables/reset/{id}', [AdminController::class, 'resetTable'])->name('tables.reset');
 
     Route::post('/restaurants/select', [AdminController::class, 'selectRestaurant'])->name('restaurants.select');
+    Route::get('/api/new-orders-check', [AdminController::class, 'checkNewOrders'])->name('api.new-orders-check');
 });
 
 Route::name('admin.')->group(function () {

@@ -95,8 +95,6 @@ new class extends Component {
         $stats = [
             'total_today' => Order::where('restaurant_id', $restaurantId)->whereDate('created_at', today())->count(),
             'pending' => Order::where('restaurant_id', $restaurantId)->where('status', 'pending')->count(),
-            'preparing' => Order::where('restaurant_id', $restaurantId)->where('status', 'preparing')->count(),
-            'ready' => Order::where('restaurant_id', $restaurantId)->where('status', 'ready')->count(),
             'revenue_today' => Order::where('restaurant_id', $restaurantId)->whereDate('created_at', today())->whereNotIn('status', ['cancelled'])->sum('total_amount'),
         ];
 
@@ -155,7 +153,7 @@ new class extends Component {
             </div>
         @endif
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-4 flex flex-col justify-between">
                 <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Bugün Toplam</span>
                 <div class="flex items-baseline justify-between mt-2">
@@ -172,23 +170,7 @@ new class extends Component {
                 </div>
             </div>
 
-            <div class="bg-slate-800/60 border border-blue-500/30 rounded-2xl p-4 flex flex-col justify-between">
-                <span class="text-xs font-semibold text-blue-400 uppercase tracking-wider">Hazırlanan</span>
-                <div class="flex items-baseline justify-between mt-2">
-                    <span class="text-3xl font-extrabold text-blue-400">{{ $stats['preparing'] }}</span>
-                    <i class="fa-solid fa-fire text-blue-500/60 text-xl"></i>
-                </div>
-            </div>
-
-            <div class="bg-slate-800/60 border border-emerald-500/30 rounded-2xl p-4 flex flex-col justify-between">
-                <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Servise Hazır</span>
-                <div class="flex items-baseline justify-between mt-2">
-                    <span class="text-3xl font-extrabold text-emerald-400">{{ $stats['ready'] }}</span>
-                    <i class="fa-solid fa-bell-concierge text-emerald-500/60 text-xl"></i>
-                </div>
-            </div>
-
-            <div class="bg-slate-800/60 border border-purple-500/30 rounded-2xl p-4 flex flex-col justify-between col-span-2 sm:col-span-1">
+            <div class="bg-slate-800/60 border border-purple-500/30 rounded-2xl p-4 flex flex-col justify-between">
                 <span class="text-xs font-semibold text-purple-400 uppercase tracking-wider">Günlük Ciro</span>
                 <div class="flex items-baseline justify-between mt-2">
                     <span class="text-2xl font-extrabold text-purple-300">₺{{ number_format($stats['revenue_today'], 2) }}</span>
@@ -204,13 +186,7 @@ new class extends Component {
             <button wire:click="$set('filterStatus', 'pending')" class="px-4 py-2 rounded-xl font-semibold text-sm transition-all whitespace-nowrap {{ $filterStatus === 'pending' ? 'bg-amber-500 text-slate-950 shadow-md font-bold' : 'bg-slate-800 text-slate-400 hover:text-slate-200' }}">
                 Bekleyenler ({{ $stats['pending'] }})
             </button>
-            <button wire:click="$set('filterStatus', 'preparing')" class="px-4 py-2 rounded-xl font-semibold text-sm transition-all whitespace-nowrap {{ $filterStatus === 'preparing' ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-800 text-slate-400 hover:text-slate-200' }}">
-                Hazırlananlar ({{ $stats['preparing'] }})
-            </button>
-            <button wire:click="$set('filterStatus', 'ready')" class="px-4 py-2 rounded-xl font-semibold text-sm transition-all whitespace-nowrap {{ $filterStatus === 'ready' ? 'bg-emerald-600 text-white shadow-md' : 'bg-slate-800 text-slate-400 hover:text-slate-200' }}">
-                Hazır ({{ $stats['ready'] }})
-            </button>
-            <button wire:click="$set('filterStatus', 'completed')" class="px-4 py-2 rounded-xl font-semibold text-sm transition-all whitespace-nowrap {{ $filterStatus === 'completed' ? 'bg-slate-700 text-slate-200' : 'bg-slate-800 text-slate-400 hover:text-slate-200' }}">
+            <button wire:click="$set('filterStatus', 'completed')" class="px-4 py-2 rounded-xl font-semibold text-sm transition-all whitespace-nowrap {{ $filterStatus === 'completed' ? 'bg-emerald-600 text-white shadow-md' : 'bg-slate-800 text-slate-400 hover:text-slate-200' }}">
                 Tamamlananlar
             </button>
             <button wire:click="$set('filterStatus', 'cancelled')" class="px-4 py-2 rounded-xl font-semibold text-sm transition-all whitespace-nowrap {{ $filterStatus === 'cancelled' ? 'bg-rose-600/80 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200' }}">
@@ -230,16 +206,12 @@ new class extends Component {
                     @php
                         $badgeClass = match($order->status) {
                             'pending' => 'bg-amber-500/20 text-amber-400 border-amber-500/40',
-                            'preparing' => 'bg-blue-500/20 text-blue-400 border-blue-500/40',
-                            'ready' => 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40',
-                            'completed' => 'bg-slate-700 text-slate-300 border-slate-600',
+                            'completed' => 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40',
                             'cancelled' => 'bg-rose-500/20 text-rose-400 border-rose-500/40',
                             default => 'bg-slate-700 text-slate-300 border-slate-600'
                         };
                         $statusLabel = match($order->status) {
                             'pending' => 'Bekliyor',
-                            'preparing' => 'Hazırlanıyor',
-                            'ready' => 'Servise Hazır',
                             'completed' => 'Tamamlandı',
                             'cancelled' => 'İptal Edildi',
                             default => $order->status
@@ -303,33 +275,10 @@ new class extends Component {
                                 <span class="text-xl font-bold text-amber-400">₺{{ number_format($order->total_amount, 2) }}</span>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-2">
-                                @if($order->status === 'pending')
-                                    <button wire:click="updateStatus({{ $order->id }}, 'preparing')" class="col-span-2 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs transition-colors shadow-md flex justify-center items-center gap-1.5">
-                                        <i class="fa-solid fa-fire"></i> Hazırlanıyor Yap
-                                    </button>
-                                @elseif($order->status === 'preparing')
-                                    <button wire:click="updateStatus({{ $order->id }}, 'ready')" class="col-span-2 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs transition-colors shadow-md flex justify-center items-center gap-1.5">
-                                        <i class="fa-solid fa-bell-concierge"></i> Servise Hazır Yap
-                                    </button>
-                                @elseif($order->status === 'ready')
-                                    <button wire:click="updateStatus({{ $order->id }}, 'completed')" class="col-span-2 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold text-xs transition-colors shadow-md flex justify-center items-center gap-1.5">
-                                        <i class="fa-solid fa-check-double"></i> Tamamla
-                                    </button>
-                                @else
-                                    <button wire:click="selectOrder({{ $order->id }})" class="col-span-2 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-xl font-semibold text-xs transition-colors">
-                                        Detay Gör
-                                    </button>
-                                @endif
-
-                                @if(in_array($order->status, ['pending', 'preparing']))
-                                    <button wire:click="updateStatus({{ $order->id }}, 'cancelled')" class="py-2 bg-rose-600/20 hover:bg-rose-600/40 text-rose-400 border border-rose-500/30 rounded-xl font-semibold text-xs transition-colors">
-                                        İptal Et
-                                    </button>
-                                    <button wire:click="selectOrder({{ $order->id }})" class="py-2 bg-slate-700/60 hover:bg-slate-700 text-slate-300 rounded-xl font-semibold text-xs transition-colors">
-                                        Detay
-                                    </button>
-                                @endif
+                            <div class="flex flex-col gap-2">
+                                <button wire:click="selectOrder({{ $order->id }})" class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-xl font-semibold text-xs transition-colors">
+                                    Detay Gör
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -379,13 +328,20 @@ new class extends Component {
                         </div>
                     </div>
 
-                    <div class="flex gap-2">
-                        <button wire:click="deleteOrder({{ $selectedOrder->id }})" class="w-1/2 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-bold text-xs transition-colors">
-                            Siparişi Sil
-                        </button>
-                        <button wire:click="closeOrderModal" class="w-1/2 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold text-xs transition-colors">
-                            Kapat
-                        </button>
+                    <div class="flex flex-col gap-2">
+                        @if($selectedOrder->status === 'pending')
+                            <button wire:click="updateStatus({{ $selectedOrder->id }}, 'completed'); closeOrderModal();" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs transition-colors shadow-md flex justify-center items-center gap-1.5">
+                                <i class="fa-solid fa-check-double"></i> Tamamla
+                            </button>
+                        @endif
+                        <div class="flex gap-2">
+                            <button wire:click="deleteOrder({{ $selectedOrder->id }})" class="w-1/2 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-bold text-xs transition-colors">
+                                Siparişi Sil
+                            </button>
+                            <button wire:click="closeOrderModal" class="w-1/2 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold text-xs transition-colors">
+                                Kapat
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

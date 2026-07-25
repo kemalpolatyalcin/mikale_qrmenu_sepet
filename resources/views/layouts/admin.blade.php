@@ -91,11 +91,8 @@
                         gain.gain.setValueAtTime(0, audioCtx.currentTime);
                         osc.start(audioCtx.currentTime);
                         osc.stop(audioCtx.currentTime + 0.01);
-                    });
+                    }).catch(e => {});
                 }
-                window.removeEventListener('click', unlock);
-                window.removeEventListener('keydown', unlock);
-                window.removeEventListener('touchstart', unlock);
             }
             window.addEventListener('click', unlock);
             window.addEventListener('keydown', unlock);
@@ -130,11 +127,11 @@
                         osc2.start(audioCtx.currentTime + 0.2);
                         osc2.stop(audioCtx.currentTime + 1.0);
                     } catch(e) {}
-                });
+                }).catch(err => {});
             }
 
             function checkNewOrders() {
-                fetch('/admin/api/new-orders-check')
+                fetch('{{ url('admin/api/new-orders-check') }}')
                     .then(response => response.json())
                     .then(data => {
                         if (data.has_new) {

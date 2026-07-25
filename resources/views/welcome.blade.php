@@ -191,10 +191,10 @@
     @livewireStyles
 </head>
 
-<body class="bg-[#F9F8F3] md:bg-brand-bg flex md:block justify-center h-screen md:h-auto items-center font-sans">
+<body class="bg-[#F9F8F3] md:bg-brand-bg flex md:block justify-center h-[100dvh] md:h-auto items-center font-sans">
 
     <div
-        class="w-full max-w-md md:max-w-none h-full md:h-auto md:min-h-screen bg-brand-bg relative overflow-hidden md:overflow-visible flex flex-col shadow-2xl md:shadow-none border border-gray-100 md:border-none shrink-0 md:shrink">
+        class="w-full max-w-md md:max-w-none h-[100dvh] md:h-auto md:min-h-screen bg-brand-bg relative overflow-hidden md:overflow-visible flex flex-col shadow-2xl md:shadow-none border border-gray-100 md:border-none shrink-0 md:shrink">
 
         <div id="splash-screen"
             class="absolute inset-0 z-[100] bg-brand-bg flex justify-center items-center transition-opacity duration-700 ease-in-out">
@@ -436,31 +436,27 @@
         </main>
 
         <nav
-            class="absolute md:hidden bottom-0 w-full bg-white rounded-t-3xl shadow-[0_-5px_15px_rgba(0,0,0,0.05)] px-4 py-4 pb-6 flex justify-between items-center text-[10px] sm:text-xs font-medium text-gray-500 z-50">
+            class="fixed md:hidden bottom-0 left-0 right-0 w-full bg-white rounded-t-3xl shadow-[0_-5px_15px_rgba(0,0,0,0.05)] px-4 py-4 pb-6 flex justify-between items-center text-[10px] sm:text-xs font-medium text-gray-500 z-50">
             <button onclick="switchView('home')"
-                class="nav-btn active flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-brand-gold w-1/5"
+                class="nav-btn active flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-brand-gold w-1/4"
                 data-target="home">
                 <i class="fa-solid fa-house text-lg mb-0.5"></i><span data-i18n="navHome">Ana Sayfa</span>
             </button>
             <button onclick="switchView('search')"
-                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors w-1/5"
+                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors w-1/4"
                 data-target="search">
                 <i class="fa-solid fa-magnifying-glass text-lg mb-0.5"></i><span data-i18n="navSearch">Menü</span>
             </button>
             <button onclick="window.dispatchEvent(new CustomEvent('open-cart'))"
-                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-gray-500 w-1/5 relative">
+                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-gray-500 w-1/4 relative">
                 <i class="fa-solid fa-basket-shopping text-lg mb-0.5"></i>
                 <span>Sepet</span>
                 <span id="mobile-cart-count-badge" class="absolute top-2 right-6 bg-red-500 text-white rounded-full text-[8px] min-w-[14px] h-3.5 flex items-center justify-center font-bold px-0.5 {{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') > 0 ? '' : 'hidden' }}">
                     {{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') }}
                 </span>
             </button>
-            <button onclick="window.open('/admin/orders', '_blank')"
-                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-gray-500 w-1/5">
-                <i class="fa-solid fa-desktop text-lg mb-0.5"></i><span>Siparişler</span>
-            </button>
             <button onclick="window.open('/admin', '_blank')"
-                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-gray-500 w-1/5">
+                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-gray-500 w-1/4">
                 <i class="fa-solid fa-user-lock text-lg mb-0.5"></i><span>Admin</span>
             </button>
         </nav>

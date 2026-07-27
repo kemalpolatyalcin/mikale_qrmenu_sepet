@@ -74,3 +74,46 @@
         </div>
     </div>
 </aside>
+
+<script>
+    (function() {
+        const token = localStorage.getItem('admin_token');
+        if (token) {
+            const originalFetch = window.fetch;
+            window.fetch = async function(url, options = {}) {
+                options.headers = options.headers || {};
+                if (!options.headers['Authorization']) {
+                    options.headers['Authorization'] = `Bearer ${token}`;
+                }
+                options.headers['Accept'] = 'application/json';
+                const response = await originalFetch(url, options);
+                if (response.status === 401) {
+                    localStorage.removeItem('admin_token');
+                    window.location.href = '/login';
+                }
+                return response;
+            };
+        }
+
+        document.addEventListener('submit', async function(e) {
+            const form = e.target;
+            if (form && form.action && form.action.endsWith('/logout')) {
+                const token = localStorage.getItem('admin_token');
+                if (token) {
+                    e.preventDefault();
+                    try {
+                        await fetch('/api/admin/logout', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Accept': 'application/json'
+                            }
+                        });
+                    } catch (err) {}
+                    localStorage.removeItem('admin_token');
+                    form.submit();
+                }
+            }
+        });
+    })();
+</script>

@@ -2,9 +2,15 @@
 <html lang="tr">
 
 <head>
+    <script>
+        const token = localStorage.getItem('admin_token');
+        if (!token || token === 'undefined' || token === 'null' || token === '') {
+            window.location.href = '/login';
+        }
+    </script>
     <meta charset="UTF-8">
     <title>Mikale | Canlı Siparişler</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Allison&family=Poppins:wght@300;400;500;600&display=swap"
         rel="stylesheet">

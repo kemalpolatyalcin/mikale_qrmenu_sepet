@@ -55,7 +55,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
-Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
 
@@ -113,3 +113,7 @@ Route::get('/manager', function () {
 });
 
 Route::get('/api/orders', [OrderController::class, 'index']);
+
+Route::get('/sanctum-login', function () {
+    return view('sanctum-login');
+});

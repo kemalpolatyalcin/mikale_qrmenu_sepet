@@ -2,10 +2,16 @@
 <html lang="tr">
 
 <head>
+    <script>
+        const token = localStorage.getItem('admin_token');
+        if (!token || token === 'undefined' || token === 'null' || token === '') {
+            window.location.href = '/login';
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mikale | Yönetim Paneli</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Allison&family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
@@ -77,6 +83,16 @@
 
     <script>
         (function() {
+            const originalFetch = window.fetch;
+            window.fetch = async function(...args) {
+                let response = await originalFetch(...args);
+                if (response.status === 401) {
+                    localStorage.removeItem('admin_token');
+                    window.location.href = '/login';
+                }
+                return response;
+            };
+
             let audioCtx = null;
             function unlock() {
                 if (!audioCtx) {
@@ -186,6 +202,27 @@
                     .catch(err => {});
             }
             setInterval(checkNewOrders, 5000);
+
+            document.addEventListener('submit', async function(e) {
+                const form = e.target;
+                if (form && form.action && form.action.endsWith('/logout')) {
+                    const token = localStorage.getItem('admin_token');
+                    if (token) {
+                        e.preventDefault();
+                        try {
+                            await fetch('/api/admin/logout', {
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': `Bearer ${token}`,
+                                    'Accept': 'application/json'
+                                }
+                            });
+                        } catch (err) {}
+                        localStorage.removeItem('admin_token');
+                        form.submit();
+                    }
+                }
+            });
         })();
     </script>
 </body>

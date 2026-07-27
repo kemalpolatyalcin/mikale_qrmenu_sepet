@@ -2,10 +2,16 @@
 <html lang="tr">
 
 <head>
+    <script>
+        const token = localStorage.getItem('admin_token');
+        if (!token || token === 'undefined' || token === 'null' || token === '') {
+            window.location.href = '/login';
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mikale | Kategoriler</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Allison&family=Poppins:wght@300;400;500;600&display=swap"
         rel="stylesheet">
@@ -40,7 +46,7 @@
             <div class="flex items-center gap-4">
                 <div
                     class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-bold border-2 border-[#8C6C47]">
-                    {{ substr(Auth::user()->full_name ?? Auth::user()->name ?? 'A', 0, 1) }}
+                    {{ substr(optional(Auth::user())->full_name ?? optional(Auth::user())->name ?? 'A', 0, 1) }}
                 </div>
             </div>
         </header>

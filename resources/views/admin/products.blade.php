@@ -2,9 +2,15 @@
 <html lang="tr">
 
 <head>
+    <script>
+        const token = localStorage.getItem('admin_token');
+        if (!token || token === 'undefined' || token === 'null' || token === '') {
+            window.location.href = '/login';
+        }
+    </script>
     <meta charset="UTF-8">
     <title>Mikale | Ürünler</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Allison&family=Poppins:wght@300;400;500;600&display=swap"
         rel="stylesheet">
@@ -39,7 +45,7 @@
             <div class="flex items-center gap-4">
                 <div
                     class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-bold border-2 border-[#8C6C47]">
-                    {{ substr(Auth::user()->full_name ?? Auth::user()->name ?? 'A', 0, 1) }}
+                    {{ substr(optional(Auth::user())->full_name ?? optional(Auth::user())->name ?? 'A', 0, 1) }}
                 </div>
             </div>
         </header>
@@ -95,10 +101,9 @@
                                                 class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white inline-flex items-center justify-center transition-colors">
                                                 <i class="fa-solid fa-pen text-xs"></i>
                                             </button>
-                                            <a href="{{ route('admin.products.delete', $product->id) }}"
-                                                onclick="return confirm('Emin misiniz?')"
-                                                class="inline-flex w-8 h-8 items-center justify-center rounded-full bg-red-50 text-red-600 hover:bg-red-600 hover:text-white"><i
-                                                    class="fa-solid fa-trash text-xs"></i></a>
+                                            <button data-id="{{ $product->id }}"
+                                                class="delete-product-btn inline-flex w-8 h-8 items-center justify-center rounded-full bg-red-50 text-red-600 hover:bg-red-600 hover:text-white"><i
+                                                    class="fa-solid fa-trash text-xs"></i></button>
                                         </td>
                                     </tr>
                                 @empty
@@ -121,7 +126,7 @@
                     class="absolute top-6 right-6 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 hover:bg-red-50 transition-colors"><i
                         class="fa-solid fa-xmark"></i></button>
                 <h3 class="text-xl font-semibold text-gray-800 mb-6">Yeni Ürün Ekle</h3>
-                <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data"
+                <form id="addProductForm" action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data"
                     class="space-y-4">
                     @csrf
                     <div>
@@ -274,6 +279,110 @@
                     });
                 });
             }
+
+            const addProductForm = document.getElementById("addProductForm");
+            if (addProductForm) {
+                addProductForm.addEventListener("submit", async function (e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    try {
+                        const response = await fetch("/api/products", {
+                            method: "POST",
+                            headers: {
+                                "Accept": "application/json",
+                                "Authorization": `Bearer ${localStorage.getItem("admin_token")}`
+                            },
+                            body: formData
+                        });
+                        const result = await response.json();
+                        if (response.ok && result.status === "success") {
+                            closeAddProductModal();
+                            this.reset();
+                            
+                            const tableBody = document.getElementById("product-table-body");
+                            if (tableBody) {
+                                const emptyRow = tableBody.querySelector("td[colspan]");
+                                if (emptyRow) {
+                                    tableBody.innerHTML = "";
+                                }
+                                const newRow = document.createElement("tr");
+                                newRow.className = "hover:bg-gray-50";
+                                newRow.innerHTML = `
+                                    <td class="p-4 flex items-center gap-4">
+                                        <img src="/${result.product.image_url || 'images/none.png'}" class="w-12 h-12 rounded-lg object-cover bg-gray-200">
+                                        <div>
+                                            <p class="font-medium text-gray-800 text-sm">${result.product.name}
+                                                ${result.product.is_gluten_free ? '<span class="text-[9px] bg-amber-100 text-[#8C6C47] px-2 py-0.5 rounded">GF</span>' : ''}
+                                            </p>
+                                            <p class="text-xs text-gray-500 line-clamp-1 w-48">${result.product.description || ''}</p>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 font-semibold text-[#8C6C47] text-sm">₺${result.product.price}</td>
+                                    <td class="p-4 text-right space-x-1">
+                                        <button onclick='openEditProductModal(${JSON.stringify(result.product)})' class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white inline-flex items-center justify-center transition-colors">
+                                            <i class="fa-solid fa-pen text-xs"></i>
+                                        </button>
+                                        <button data-id="${result.product.id}" class="delete-product-btn inline-flex w-8 h-8 items-center justify-center rounded-full bg-red-50 text-red-600 hover:bg-red-600 hover:text-white"><i class="fa-solid fa-trash text-xs"></i></button>
+                                    </td>
+                                `;
+                                tableBody.appendChild(newRow);
+                            }
+                            
+                            const successMsg = document.createElement("div");
+                            successMsg.className = "bg-green-50 text-green-700 p-4 rounded-xl mb-6 border border-green-200";
+                            successMsg.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i> Ürün başarıyla eklendi!';
+                            const mainContainer = document.querySelector(".flex-1.overflow-y-auto.p-8");
+                            if (mainContainer) {
+                                mainContainer.insertBefore(successMsg, mainContainer.firstChild);
+                                setTimeout(() => successMsg.remove(), 4000);
+                            }
+                        } else {
+                            alert(result.message || "Ürün eklenirken bir hata oluştu.");
+                        }
+                    } catch (err) {
+                        alert("İşlem gerçekleştirilemedi.");
+                    }
+                });
+            }
+
+            document.addEventListener("click", async function (e) {
+                const btn = e.target.closest(".delete-product-btn");
+                if (btn) {
+                    e.preventDefault();
+                    if (confirm("Emin misiniz?")) {
+                        const id = btn.getAttribute("data-id");
+                        try {
+                            const response = await fetch(`/api/products/${id}`, {
+                                method: "DELETE",
+                                headers: {
+                                    "Accept": "application/json",
+                                    "Authorization": `Bearer ${localStorage.getItem("admin_token")}`
+                                }
+                            });
+                            const result = await response.json();
+                            if (response.ok && result.status === "success") {
+                                const row = btn.closest("tr");
+                                if (row) {
+                                    row.remove();
+                                }
+                                
+                                const successMsg = document.createElement("div");
+                                successMsg.className = "bg-green-50 text-green-700 p-4 rounded-xl mb-6 border border-green-200";
+                                successMsg.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i> Ürün silindi!';
+                                const mainContainer = document.querySelector(".flex-1.overflow-y-auto.p-8");
+                                if (mainContainer) {
+                                    mainContainer.insertBefore(successMsg, mainContainer.firstChild);
+                                    setTimeout(() => successMsg.remove(), 4000);
+                                }
+                            } else {
+                                alert(result.message || "Ürün silinirken bir hata oluştu.");
+                            }
+                        } catch (err) {
+                            alert("İşlem gerçekleştirilemedi.");
+                        }
+                    }
+                }
+            });
         });
     </script>
     @include('admin.partials.mobile-menu')

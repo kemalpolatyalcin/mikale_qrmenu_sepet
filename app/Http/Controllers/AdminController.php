@@ -165,6 +165,13 @@ class AdminController extends Controller
         }
 
         $product->save();
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Ürün başarıyla eklendi!',
+                'product' => $product
+            ]);
+        }
         return redirect()->back()->with('success', 'Ürün başarıyla eklendi!');
     }
 
@@ -196,6 +203,13 @@ class AdminController extends Controller
         }
 
         $product->save();
+        if (request()->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Ürün başarıyla güncellendi!',
+                'product' => $product
+            ]);
+        }
         return redirect()->back()->with('success', 'Ürün başarıyla güncellendi!');
     }
 
@@ -206,6 +220,12 @@ class AdminController extends Controller
             File::delete(public_path($product->image_url));
         }
         $product->delete();
+        if (request()->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Ürün silindi!'
+            ]);
+        }
         return redirect()->back()->with('success', 'Ürün silindi!');
     }
 

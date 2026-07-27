@@ -73,6 +73,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/products/delete/{id}', [AdminController::class, 'deleteProduct'])->name('products.delete');
 
     Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
+    Route::get('/register', [AdminController::class, 'register'])->name('register');
 
     Route::get('/tables', [AdminController::class, 'tables'])->name('tables');
     Route::post('/tables', [AdminController::class, 'storeTable'])->name('tables.store');
@@ -90,11 +91,22 @@ Route::name('admin.')->group(function () {
     Route::get('/developer/restaurants/delete/{id}', [AdminController::class, 'deleteRestaurant'])->name('restaurants.delete');
 });
 
+Route::post('/api/login', [AuthController::class, 'apiLogin']);
+
 Route::get('/api/categories', [MenuController::class, 'getCategories']);
 Route::get('/api/products', [MenuController::class, 'getProducts']);
 Route::get('/api/tables/{token}', [MenuController::class, 'getTable']);
 
 Route::post('/api/orders/place', [OrderController::class, 'placeOrder']);
+
+Route::middleware('api.bearer')->prefix('api')->group(function () {
+    Route::get('/sync/status', [\App\Http\Controllers\Api\SyncController::class, 'getStatus']);
+    Route::get('/sync/tables', [\App\Http\Controllers\Api\SyncController::class, 'getTables']);
+    Route::post('/sync/tables', [\App\Http\Controllers\Api\SyncController::class, 'syncTables']);
+    Route::post('/sync/orders', [\App\Http\Controllers\Api\SyncController::class, 'placeOrUpdateOrder']);
+    Route::post('/sync/settle', [\App\Http\Controllers\Api\SyncController::class, 'settleOrder']);
+    Route::post('/sync/transactions', [\App\Http\Controllers\Api\SyncController::class, 'syncTransactions']);
+});
 
 Route::get('/manager', function () {
     return view('manager');

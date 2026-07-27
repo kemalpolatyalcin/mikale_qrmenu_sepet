@@ -130,12 +130,57 @@
                 }).catch(err => {});
             }
 
+            function showNotification() {
+                let container = document.getElementById('toast-container');
+                if (!container) {
+                    container = document.createElement('div');
+                    container.id = 'toast-container';
+                    container.className = 'fixed top-4 right-4 left-4 sm:left-auto sm:max-w-sm z-[9999] flex flex-col gap-3 pointer-events-none';
+                    document.body.appendChild(container);
+                }
+
+                let toast = document.createElement('div');
+                toast.className = 'bg-slate-800 border border-amber-500/50 text-white rounded-2xl p-4 shadow-2xl flex items-center gap-3 transform translate-x-12 opacity-0 transition-all duration-300 pointer-events-auto cursor-pointer hover:border-amber-400 hover:bg-slate-700';
+                toast.innerHTML = `
+                    <div class="w-10 h-10 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center justify-center text-amber-400 text-lg shrink-0">
+                        <i class="fa-solid fa-bell animate-bounce"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="text-sm font-bold text-white">Yeni Sipariş Alındı!</h4>
+                        <p class="text-xs text-slate-400 mt-0.5">Masa durumlarını görmek için tıklayın.</p>
+                    </div>
+                    <button class="text-slate-400 hover:text-white text-xs shrink-0 px-1 py-1" onclick="event.stopPropagation(); this.parentElement.remove();">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
+                `;
+
+                toast.onclick = function() {
+                    window.location.href = '{{ route('admin.orders') }}';
+                };
+
+                container.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.classList.remove('translate-x-12', 'opacity-0');
+                }, 50);
+
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.classList.add('translate-x-12', 'opacity-0');
+                        setTimeout(() => {
+                            toast.remove();
+                        }, 300);
+                    }
+                }, 8000);
+            }
+
             function checkNewOrders() {
                 fetch('{{ url('admin/api/new-orders-check') }}')
                     .then(response => response.json())
                     .then(data => {
                         if (data.has_new) {
                             playSound();
+                            showNotification();
                         }
                     })
                     .catch(err => {});

@@ -170,7 +170,7 @@ new class extends Component {
         </div>
 
         <div :class="open ? 'translate-x-0' : '-translate-x-full sm:translate-x-full'"
-            class="fixed top-0 left-0 sm:left-auto sm:right-0 h-full w-full sm:w-[450px] bg-brand-bg shadow-2xl z-[100] transform -translate-x-full sm:translate-x-full transition-transform duration-300 ease-in-out flex flex-col font-sans">
+            class="fixed top-0 left-0 sm:left-auto sm:right-0 h-full w-full sm:w-[450px] bg-brand-bg shadow-2xl z-[100] transform transition-transform duration-300 ease-in-out flex flex-col font-sans" x-cloak>
 
             <div class="flex flex-col bg-white border-b border-gray-100 shrink-0">
                 <div class="flex justify-between items-center px-6 py-5">

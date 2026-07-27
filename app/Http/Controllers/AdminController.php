@@ -450,4 +450,34 @@ class AdminController extends Controller
         }
         return response()->json(['has_new' => $hasNew]);
     }
+
+    public function register(Request $request)
+    {
+        $restaurantId = $this->getActiveRestaurantId();
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        $query = \App\Models\Transaction::where('restaurant_id', $restaurantId);
+
+        if ($startDate) {
+            $query->whereDate('created_at', '>=', $startDate);
+        }
+        if ($endDate) {
+            $query->whereDate('created_at', '<=', $endDate);
+        }
+
+        $transactions = $query->orderBy('id', 'desc')->get();
+
+        $totals = [
+            'Nakit' => (clone $query)->where('payment_method', 'Nakit')->sum('amount'),
+            'Kredi Kartı' => (clone $query)->where('payment_method', 'Kredi Kartı')->sum('amount'),
+            'Cari Hesap' => (clone $query)->where('payment_method', 'Cari Hesap')->sum('amount'),
+            'Yemek Fişi' => (clone $query)->where('payment_method', 'Yemek Fişi')->sum('amount'),
+            'Online Ödeme' => (clone $query)->where('payment_method', 'Online Ödeme')->sum('amount'),
+            'Ödenmez' => (clone $query)->where('payment_method', 'Ödenmez')->sum('amount'),
+            'grand_total' => (clone $query)->sum('amount'),
+        ];
+
+        return view('admin.register', compact('transactions', 'totals', 'startDate', 'endDate'));
+    }
 }

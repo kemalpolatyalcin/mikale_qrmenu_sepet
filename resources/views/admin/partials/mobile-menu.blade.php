@@ -46,7 +46,11 @@
                 </a>
                 <a href="{{ route('admin.orders') }}"
                     class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.orders') ? 'bg-[#8C6C47] text-white shadow-md' : 'text-gray-600 hover:bg-gray-50 hover:text-[#8C6C47]' }} rounded-xl font-medium text-sm transition-all">
-                    <i class="fa-solid fa-bell-concierge w-5 text-center"></i> Aktif Siparişler
+                    <i class="fa-solid fa-table w-5 text-center"></i> Masalar
+                </a>
+                <a href="{{ route('admin.register') }}"
+                    class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.register') ? 'bg-[#8C6C47] text-white shadow-md' : 'text-gray-600 hover:bg-gray-50 hover:text-[#8C6C47]' }} rounded-xl font-medium text-sm transition-all">
+                    <i class="fa-solid fa-cash-register w-5 text-center"></i> Kasa
                 </a>
                 <a href="{{ route('admin.tables') }}"
                     class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.tables') ? 'bg-[#8C6C47] text-white shadow-md' : 'text-gray-600 hover:bg-gray-50 hover:text-[#8C6C47]' }} rounded-xl font-medium text-sm transition-all">

@@ -187,6 +187,9 @@
             opacity: 1;
             pointer-events: auto;
         }
+        [x-cloak] {
+            display: none !important;
+        }
     </style>
     @livewireStyles
 </head>
@@ -250,25 +253,18 @@
             <div class="flex items-center gap-4 text-sm font-semibold">
                 <div class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs font-bold shadow-sm"><span
                         data-i18n="tableLabel">Masa:</span> <span class="current-table-display">-</span></div>
-                <div class="flex items-center bg-gray-50 rounded p-1 border border-gray-200">
-                    <button
-                        class="btn-lang-tr px-2 py-0.5 rounded text-black font-bold bg-white shadow-sm text-xs transition-all"
-                        onclick="changeLanguage('tr')">TR</button>
-                    <button class="btn-lang-en px-2 py-0.5 rounded text-gray-400 font-normal text-xs transition-all"
-                        onclick="changeLanguage('en')">EN</button>
-                </div>
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto no-scrollbar bg-brand-bg">
+        <main class="flex-1 overflow-y-auto no-scrollbar bg-brand-bg flex flex-col justify-between">
 
-            <div id="view-home" class="page-view active w-full h-full relative">
-                <div class="relative w-full h-[420px] md:h-[60vh] rounded-b-[2rem] overflow-hidden">
+            <div id="view-home" class="page-view active w-full relative">
+                <div class="relative w-full h-[340px] md:h-[60vh] rounded-b-[2rem] overflow-hidden">
                     <img src="{{ isset($siteSettings['cover_image']) && $siteSettings['cover_image'] != '' ? asset($siteSettings['cover_image']) : asset('images/background.jpg') }}"
                         class="w-full h-full object-cover" alt="">
                     <div class="absolute inset-0 bg-gradient-to-t from-brand-bg from-5% via-black/40 to-black/30"></div>
 
-                    <div class="absolute top-12 md:top-6 right-6 flex items-center gap-3 z-20">
+                    <div class="absolute top-4 md:top-6 right-6 flex items-center gap-3 z-20">
                         <div
                             class="bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm border border-white/20">
                             <span data-i18n="tableLabel">Masa:</span> <span class="current-table-display">-</span>
@@ -283,36 +279,32 @@
                         </div>
                     </div>
 
-                    <div class="absolute bottom-10 left-0 w-full text-center z-10 px-4">
+                    <div class="absolute bottom-12 left-0 w-full text-center z-10 px-4">
                         <h1
-                            class="text-[31px] md:text-[45px] font-poppins font-light text-white leading-tight drop-shadow-md">
+                            class="text-[36px] md:text-[50px] font-poppins font-normal text-white leading-tight drop-shadow-md">
                             {!! $siteSettings['slogan'] ?? 'Harika Tatlar,<br>Güzel Anılar...' !!}
                         </h1>
                     </div>
                 </div>
 
-                <svg class="w-full h-12 text-brand-gold -mt-6 relative z-10 drop-shadow-sm" viewBox="0 0 1440 150"
+                <svg class="w-full h-12 text-[#8C6C47] -mt-6 relative z-10 drop-shadow-sm" viewBox="0 0 1440 150"
                     preserveAspectRatio="none" fill="currentColor">
                     <path d="M0,60 C400,160 1000,-40 1440,60 L1440,85 C1000,-15 400,185 0,85 Z"></path>
                 </svg>
 
-                <div class="flex flex-col items-center px-8 pt-6 pb-8 text-center bg-brand-bg">
-                    <div class="mb-6 md:hidden">
-                        @if(isset($siteSettings['logo']) && $siteSettings['logo'] != '')
-                            <img src="{{ asset($siteSettings['logo']) }}" class="h-24 object-contain mx-auto" alt="Logo">
-                        @else
-                            <div class="font-allison text-[7rem] leading-none text-black">
-                                {{ substr($siteSettings['restaurant_name'] ?? 'M', 0, 1) }}
-                            </div>
-                        @endif
+                <div class="flex flex-col items-center px-8 pt-4 pb-4 text-center bg-brand-bg">
+                    <div class="mb-2">
+                        <div class="font-allison text-[7rem] leading-none text-black select-none">
+                            M
+                        </div>
                     </div>
 
                     <p data-i18n="heroDesc"
-                        class="text-[18px] md:text-[21px] font-poppins font-normal text-brand-text mb-10 leading-snug max-w-2xl">
+                        class="text-[18px] md:text-[21px] font-poppins font-normal text-brand-text mb-6 md:mb-10 leading-snug max-w-2xl px-4">
                         Gelenekten ilham alan lezzetleri modern bir dokunuşla sunuyor, her ziyareti özel bir anıya
                         dönüştürüyoruz
                     </p>
-                    <div class="relative w-full max-w-sm flex items-center bg-white border border-gray-400 rounded-full shadow-sm p-1 cursor-pointer"
+                    <div class="relative w-full max-w-sm flex items-center bg-white border border-gray-300 rounded-full shadow-sm p-1 cursor-pointer"
                         onclick="switchView('search'); setTimeout(() => document.getElementById('searchInput').focus(), 100);">
                         <i
                             class="fa-solid fa-magnifying-glass absolute left-5 text-black text-lg pointer-events-none"></i>
@@ -324,71 +316,34 @@
                     </div>
                 </div>
 
-                <footer
-                    class="w-full bg-[#151515] text-gray-400 pt-12 pb-24 md:pb-12 px-6 mt-12 border-t border-white/5">
-                    <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-center md:justify-start gap-2">
-                                @if(isset($siteSettings['logo']) && $siteSettings['logo'] != '')
-                                    <img src="{{ asset($siteSettings['logo']) }}" class="h-8 object-contain" alt="Logo">
-                                @else
-                                    <div class="font-allison text-4xl text-white leading-none pt-1">
-                                        {{ substr($siteSettings['restaurant_name'] ?? 'M', 0, 1) }}
-                                    </div>
-                                @endif
-                                <span
-                                    class="font-serif font-bold text-lg text-white tracking-widest">{{ $siteSettings['restaurant_name'] ?? '' }}</span>
-                            </div>
-                            <p class="text-xs text-gray-500 leading-relaxed font-light">
-                                Gelenekten ilham alan lezzetleri modern bir dokunuşla sunuyor, her ziyareti özel bir
-                                anıya dönüştürüyoruz.
-                            </p>
-                            <div class="flex items-center justify-center md:justify-start gap-4 text-white text-base">
-                                <a href="#" class="hover:text-amber-500 transition-colors"><i
-                                        class="fa-brands fa-instagram"></i></a>
-                                <a href="#" class="hover:text-amber-500 transition-colors"><i
-                                        class="fa-brands fa-facebook"></i></a>
-                                <a href="#" class="hover:text-amber-500 transition-colors"><i
-                                        class="fa-brands fa-twitter"></i></a>
-                            </div>
-                        </div>
-
-                        <div class="space-y-3">
-                            <h4 class="text-white text-xs font-semibold tracking-widest uppercase">Çalışma Saatleri</h4>
-                            <ul class="text-xs space-y-1.5 font-light text-gray-500">
-                                <li>Pazartesi - Cuma: 09:00 - 23:00</li>
-                                <li>Cumartesi - Pazar: 09:00 - 00:00</li>
-                            </ul>
-                        </div>
-
-                        <div class="space-y-3">
-                            <h4 class="text-white text-xs font-semibold tracking-widest uppercase">İletişim & Adres</h4>
-                            <p class="text-xs text-gray-500 leading-relaxed font-light">
-                                Atatürk Cad. No: 123, Merkez
-                            </p>
-                            @if(isset($siteSettings['wifi_password']) && $siteSettings['wifi_password'] != '')
-                                <p
-                                    class="text-xs text-gray-500 font-light flex items-center justify-center md:justify-start gap-1">
-                                    <i class="fa-solid fa-wifi text-amber-500/80"></i> Wi-Fi: <strong
-                                        class="text-gray-400">{{ $siteSettings['wifi_password'] }}</strong>
-                                </p>
-                            @endif
-                        </div>
+                <div class="w-full max-w-5xl mx-auto px-6 mt-4">
+                    <h3 class="text-brand-text font-serif font-bold text-base mb-3 tracking-wide text-left">Kategoriler</h3>
+                    <div id="home-category-list" class="grid grid-cols-1 md:grid-cols-4 gap-4 pb-4">
                     </div>
-                    <div class="w-full h-px bg-white/5 my-8 max-w-5xl mx-auto"></div>
-                    <div
-                        class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between text-[10px] text-gray-600 gap-4">
-                        <p>&copy; {{ date('Y') }} {{ $siteSettings['restaurant_name'] ?? '' }}. Tüm hakları saklıdır.
-                        </p>
-                        <p class="uppercase font-semibold tracking-wider">
-                            Powered by <a href="#" target="_blank"
-                                class="hover:text-amber-600 transition-colors text-gray-400">Mikale QR Menu</a>
-                        </p>
-                    </div>
-                </footer>
+                </div>
             </div>
 
             <div id="view-search" class="page-view px-6 pt-4 pb-28 md:pb-12">
+
+                <div class="flex flex-col gap-4 max-w-2xl mx-auto mb-6">
+                    <div class="flex md:hidden items-center justify-between">
+                        <button onclick="window.dispatchEvent(new CustomEvent('open-cart'))" class="relative text-black text-xl hover:text-brand-gold transition-colors">
+                            <i class="fa-solid fa-basket-shopping"></i>
+                            <span id="cart-count-badge-search" class="absolute -top-2 -right-2.5 bg-red-500 text-white rounded-full text-[8px] min-w-[14px] h-3.5 flex items-center justify-center font-bold px-0.5 {{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') > 0 ? '' : 'hidden' }}">{{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') }}</span>
+                        </button>
+                        <div class="font-allison text-6xl text-black leading-none pt-2 cursor-pointer select-none" onclick="switchView('home')">
+                            M
+                        </div>
+                        <div class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs font-bold shadow-sm">
+                            <span data-i18n="tableLabel">Masa:</span> <span class="current-table-display">-</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <button onclick="switchView('home')" class="flex items-center gap-1.5 text-sm font-semibold text-gray-700 hover:text-black transition-colors">
+                            <i class="fa-solid fa-chevron-left"></i> Geri
+                        </button>
+                    </div>
+                </div>
 
                 @if(isset($siteSettings['wifi_password']) && $siteSettings['wifi_password'] != '')
                     <div class="max-w-2xl mx-auto mb-4 text-center">
@@ -400,39 +355,55 @@
                     </div>
                 @endif
 
-                <div class="relative mb-6 mt-2 max-w-2xl mx-auto">
-                    <i
-                        class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 transform -translate-y-1/2 text-black text-lg"></i>
+                <div class="relative mb-6 mt-2 max-w-2xl mx-auto flex items-center bg-white border border-gray-300 rounded-full shadow-sm pr-4">
+                    <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 transform -translate-y-1/2 text-black text-lg"></i>
                     <input type="text" id="searchInput" oninput="handleSearch(this.value)"
                         data-i18n-placeholder="search" placeholder="Arama...."
-                        class="w-full bg-white border border-gray-300 rounded-full py-3.5 pl-14 pr-4 focus:outline-none text-sm text-black shadow-sm font-poppins font-normal">
+                        class="w-full bg-transparent py-3.5 pl-14 pr-12 focus:outline-none text-sm text-black font-poppins font-normal">
+                    <i class="fa-solid fa-sliders text-black text-lg cursor-pointer"></i>
                 </div>
 
-                <div id="category-list" class="grid grid-cols-2 md:grid-cols-4 gap-4 pb-4 max-w-5xl mx-auto">
-                    <p data-i18n="loadingCats" class="text-center text-gray-500 py-4 col-span-full">Kategoriler
-                        yükleniyor...</p>
+                <div id="category-list" class="hidden">
+                    <p data-i18n="loadingCats" class="text-center text-gray-500 py-4 col-span-full">Kategoriler yükleniyor...</p>
                 </div>
 
-                <div id="dynamic-product-list" class="hidden flex-col pb-8 max-w-5xl mx-auto">
+                <div id="dynamic-product-list" class="flex flex-col pb-8 max-w-5xl mx-auto">
                     <div class="w-full mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div class="flex items-center gap-4">
-                            <button onclick="backToCategories()"
-                                class="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm text-brand-dark"><i
-                                    class="fa-solid fa-arrow-left"></i></button>
+                        <div class="flex items-center">
                             <h3 id="dynamic-products-title"
                                 class="font-serif text-2xl md:text-3xl font-semibold text-brand-dark"></h3>
                         </div>
                         <div class="flex overflow-x-auto no-scrollbar gap-2 pb-2" id="category-tabs"></div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6" id="products-grid"></div>
-                </div>
-                <div
-                    class="text-center pt-8 pb-12 text-[10px] text-gray-400 font-medium tracking-wider select-none uppercase">
-                    Powered by <a href="#" target="_blank"
-                        class="hover:text-amber-600 transition-colors font-bold">Mikale QR Menu</a>
+
+                    <div class="mt-8 max-w-5xl mx-auto w-full">
+                        <h3 class="font-serif text-2xl md:text-3xl font-semibold text-brand-dark mb-4 text-left">Tavsiye Edilenler</h3>
+                        <div class="space-y-4" id="recommended-products-list">
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            <footer class="w-full bg-[#151515] text-gray-500 pt-6 pb-24 md:pb-6 px-6 mt-12 border-t border-white/5 text-center shrink-0">
+                <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
+                    <div class="flex items-center gap-2 justify-center">
+                        @if(isset($siteSettings['logo']) && $siteSettings['logo'] != '')
+                            <img src="{{ asset($siteSettings['logo']) }}" class="h-6 object-contain" alt="Logo">
+                        @endif
+                        <span class="font-bold text-white tracking-wider">{{ $siteSettings['restaurant_name'] ?? '' }}</span>
+                    </div>
+                    <p>&copy; {{ date('Y') }}. Tüm hakları saklıdır.</p>
+                    @if(isset($siteSettings['wifi_password']) && $siteSettings['wifi_password'] != '')
+                        <p class="flex items-center gap-1.5 justify-center">
+                            <i class="fa-solid fa-wifi text-amber-500"></i> Wi-Fi: <strong class="text-white">{{ $siteSettings['wifi_password'] }}</strong>
+                        </p>
+                    @endif
+                    <p class="text-[10px] uppercase tracking-wider font-semibold">
+                        Powered by <a href="#" target="_blank" class="hover:text-amber-500 text-gray-400 transition-colors">Mikale QR Menu</a>
+                    </p>
+                </div>
+            </footer>
         </main>
 
         <nav
@@ -521,7 +492,7 @@
                         count = event.detail.count;
                     }
                 }
-                const badges = document.querySelectorAll('#cart-count-badge, #mobile-cart-count-badge');
+                const badges = document.querySelectorAll('#cart-count-badge, #mobile-cart-count-badge, #cart-count-badge-search');
                 badges.forEach(badge => {
                     if (count > 0) {
                         badge.innerText = count;
@@ -550,6 +521,7 @@
         let allProducts = [];
         window.appCategories = [];
         let currentTable = '-';
+        let activeCategoryId = null;
 
         function changeLanguage(lang) {
             currentLang = lang;
@@ -604,14 +576,13 @@
 
             const minSplashTime = new Promise(resolve => setTimeout(resolve, 1500));
             const fetchCat = fetch('/api/categories').then(res => res.json()).catch(() => ({ status: 'error', data: [] }));
+            const fetchProd = fetchProducts();
 
-            fetchProducts();
-
-            Promise.all([fetchCat, minSplashTime]).then(([result]) => {
+            Promise.all([fetchCat, fetchProd, minSplashTime]).then(([catResult]) => {
                 hideSplashScreen();
-                if (result && result.status === 'success') {
-                    window.appCategories = result.data;
-                    renderCategories(result.data);
+                if (catResult && catResult.status === 'success') {
+                    window.appCategories = catResult.data;
+                    renderCategories(catResult.data);
                 } else {
                     window.appCategories = [
                         { id: 1, name: 'BAŞLANGIÇ', image_url: 'images/baslangic.jpg' },
@@ -620,6 +591,9 @@
                         { id: 4, name: 'İÇECEKLER', image_url: 'images/kahve.png' }
                     ];
                     renderCategories(window.appCategories);
+                }
+                if (window.appCategories && window.appCategories.length > 0) {
+                    showProducts(window.appCategories[0].id, window.appCategories[0].name);
                 }
             }).catch(() => {
                 hideSplashScreen();
@@ -630,13 +604,17 @@
 
         function renderCategories(categories) {
             const container = document.getElementById('category-list');
+            const homeContainer = document.getElementById('home-category-list');
             container.innerHTML = '';
+            if (homeContainer) homeContainer.innerHTML = '';
 
             categories.forEach(cat => {
                 const imgUrl = cat.image_url || '';
                 const catName = cat.name.toUpperCase();
-                container.innerHTML += `
-                    <div class="w-full h-[110px] rounded-[18px] relative overflow-hidden shadow-sm cursor-pointer hover:opacity-95 transition-opacity" onclick="showProducts(${cat.id}, '${catName}')">
+                const safeName = catName.replace(/'/g, "\\'");
+                
+                const itemHtml = `
+                    <div class="w-full h-[110px] rounded-[18px] relative overflow-hidden shadow-sm cursor-pointer hover:opacity-95 transition-opacity" onclick="showProducts(${cat.id}, '${safeName}')">
                         <img src="${imgUrl}" class="absolute inset-0 w-full h-full object-cover" alt="${catName}">
                         <div class="absolute inset-0 bg-gradient-to-r from-black/95 via-black/50 to-transparent"></div>
                         <div class="absolute inset-y-0 left-6 flex items-center z-10">
@@ -644,10 +622,26 @@
                         </div>
                     </div>
                 `;
+                
+                container.innerHTML += itemHtml;
+                
+                if (homeContainer) {
+                    const homeItemHtml = `
+                        <div class="w-full h-[110px] rounded-[18px] relative overflow-hidden shadow-sm cursor-pointer hover:opacity-95 transition-opacity" onclick="switchView('search'); showProducts(${cat.id}, '${safeName}')">
+                            <img src="${imgUrl}" class="absolute inset-0 w-full h-full object-cover" alt="${catName}">
+                            <div class="absolute inset-0 bg-gradient-to-r from-black/95 via-black/50 to-transparent"></div>
+                            <div class="absolute inset-y-0 left-6 flex items-center z-10">
+                                <h3 class="text-white font-serif text-[1.1rem] tracking-wide uppercase">${catName}</h3>
+                            </div>
+                        </div>
+                    `;
+                    homeContainer.innerHTML += homeItemHtml;
+                }
             });
         }
 
         function showProducts(catId, catName) {
+            activeCategoryId = catId;
             document.getElementById('searchInput').value = '';
             document.getElementById('category-list').classList.add('hidden');
             document.getElementById('dynamic-product-list').classList.remove('hidden');
@@ -655,8 +649,11 @@
 
             let tabsHtml = '';
             window.appCategories.forEach(c => {
-                let isActive = c.id == catId ? 'bg-[#8C6C47] text-white shadow-sm' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50';
-                tabsHtml += `<button onclick="showProducts(${c.id}, '${c.name}')" class="px-5 py-2 whitespace-nowrap rounded-full font-semibold text-xs transition-colors ${isActive}">${c.name.toUpperCase()}</button>`;
+                let nameStr = c.name || '';
+                let displayTitle = nameStr.charAt(0).toUpperCase() + nameStr.slice(1).toLowerCase();
+                let isActive = c.id == catId ? 'bg-[#8C6C47] text-white shadow-sm border-[#8C6C47]' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50';
+                let safeName = nameStr.replace(/'/g, "\\'");
+                tabsHtml += `<button onclick="showProducts(${c.id}, '${safeName}')" class="px-5 py-2.5 whitespace-nowrap rounded-xl border font-semibold text-sm transition-colors ${isActive}">${displayTitle}</button>`;
             });
             document.getElementById('category-tabs').innerHTML = tabsHtml;
 
@@ -666,8 +663,10 @@
 
         function handleSearch(val) {
             if (!val || val.trim() === '') {
-                document.getElementById('category-list').classList.remove('hidden');
-                document.getElementById('dynamic-product-list').classList.add('hidden');
+                let cat = window.appCategories.find(c => c.id == activeCategoryId) || window.appCategories[0];
+                if (cat) {
+                    showProducts(cat.id, cat.name);
+                }
                 return;
             }
 
@@ -682,39 +681,44 @@
             );
 
             const searchTitle = translations[currentLang].searchResults;
-            document.getElementById('category-tabs').innerHTML = `<div class="px-5 py-2 whitespace-nowrap rounded-full font-semibold text-xs bg-[#8C6C47] text-white shadow-sm">${searchTitle}: "${val}"</div>`;
+            document.getElementById('category-tabs').innerHTML = `<div class="px-5 py-2.5 whitespace-nowrap rounded-xl border border-gray-200 font-semibold text-sm bg-[#8C6C47] text-white shadow-sm">${searchTitle}: "${val}"</div>`;
             renderProducts(filtered, searchTitle);
         }
 
         function fetchProducts() {
-            fetch('/api/products').then(res => res.json())
+            return fetch('/api/products').then(res => res.json())
                 .then(result => { if (result.status === 'success') allProducts = result.data; })
                 .catch(err => console.error(err));
         }
 
         function renderProducts(products, activeCategoryName) {
             const container = document.getElementById('products-grid');
-            document.getElementById('dynamic-products-title').innerText = activeCategoryName.toUpperCase();
+            let nameStr = activeCategoryName || '';
+            document.getElementById('dynamic-products-title').innerText = nameStr.charAt(0).toUpperCase() + nameStr.slice(1).toLowerCase();
             let html = '';
 
             products.forEach(product => {
-                const glutenFreeTag = product.is_gluten_free ? '<div class="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[9px] font-bold text-[#8C6C47] shadow-sm">GF</div>' : '';
                 const imgUrl = product.image_url || '';
                 const safeName = product.name.replace(/'/g, "\\'");
+                const kcalText = product.calories ? `${product.calories} kcal` : '250 kcal';
+                const timeText = product.prep_time ? `${product.prep_time} min` : '15 min';
+                const glutenText = product.is_gluten_free ? ' (Gluten Free)' : '';
 
                 html += `
-                    <div onclick="openProductModal(${product.id})" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 cursor-pointer transition-transform duration-300 hover:-translate-y-1 flex flex-col animate-fade-in-up">
-                        <div class="relative w-full h-28 md:h-36 bg-gray-50">
+                    <div onclick="openProductModal(${product.id})" class="bg-white rounded-[1.5rem] overflow-hidden shadow-sm border border-gray-100 cursor-pointer transition-transform duration-300 hover:-translate-y-1 flex flex-col animate-fade-in-up">
+                        <div class="relative w-full h-32 bg-gray-50">
                             <img src="${imgUrl}" class="w-full h-full object-cover" alt="">
-                            ${glutenFreeTag}
                         </div>
-                        <div class="p-3 flex flex-col justify-between flex-1">
+                        <div class="p-4 flex flex-col justify-between flex-1">
                             <div>
-                                <h4 class="font-semibold text-gray-900 text-sm line-clamp-1">${product.name}</h4>
-                                <p class="text-[10px] text-gray-500 line-clamp-2 mt-1 leading-relaxed">${product.description}</p>
+                                <h4 class="font-bold text-gray-900 text-sm line-clamp-1">${product.name}</h4>
+                                <div class="flex items-center gap-1.5 text-[9px] text-gray-400 font-semibold mt-1">
+                                    <span><i class="fa-solid fa-fire text-orange-400 mr-0.5"></i> ${kcalText}</span>
+                                    <span><i class="fa-regular fa-clock mr-0.5 text-gray-400"></i> ${timeText}${glutenText}</span>
+                                </div>
                             </div>
-                            <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-50">
-                                <span class="font-bold text-[#8C6C47] text-sm">${currencySymbol}${product.price}</span>
+                            <div class="flex justify-between items-center mt-3 pt-2">
+                                <span class="font-extrabold text-gray-900 text-sm">${currencySymbol}${product.price}</span>
                                 <button onclick="event.stopPropagation(); Livewire.dispatch('add-to-cart', { id: ${product.id}, name: '${safeName}', price: ${product.price} })" class="w-8 h-8 flex items-center justify-center bg-[#8C6C47] text-white rounded-full hover:bg-[#735738] transition-colors shadow-sm">
                                     <i class="fa-solid fa-plus"></i>
                                 </button>
@@ -724,6 +728,42 @@
                 `;
             });
 
+            container.innerHTML = html;
+            renderRecommendedProducts();
+        }
+
+        function renderRecommendedProducts() {
+            const container = document.getElementById('recommended-products-list');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            const items = allProducts.slice(0, 3);
+            let html = '';
+            items.forEach(product => {
+                const imgUrl = product.image_url || '';
+                const safeName = product.name.replace(/'/g, "\\'");
+                const kcalText = product.calories ? `${product.calories} kcal` : '300 kcal';
+                const timeText = product.prep_time ? `${product.prep_time} min` : '35 min';
+                
+                html += `
+                    <div onclick="openProductModal(${product.id})" class="bg-white rounded-[1.5rem] p-3 shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:shadow-md transition-shadow">
+                        <div class="w-20 h-20 rounded-[1rem] overflow-hidden shrink-0 bg-gray-50">
+                            <img src="${imgUrl}" class="w-full h-full object-cover" alt="">
+                        </div>
+                        <div class="flex-1 min-w-0 pr-2">
+                            <h4 class="font-bold text-gray-900 text-base truncate">${product.name}</h4>
+                            <p class="text-xs text-gray-500 line-clamp-2 mt-1 leading-snug">${product.description || ''}</p>
+                            <div class="flex justify-between items-end mt-3">
+                                <span class="font-extrabold text-gray-900 text-base">₺${product.price}</span>
+                                <div class="flex items-center gap-2 text-[10px] text-gray-500 font-semibold">
+                                    <span><i class="fa-solid fa-fire text-orange-400 mr-1"></i> ${kcalText}</span>
+                                    <span><i class="fa-regular fa-clock mr-1 text-gray-400"></i> ${timeText}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
             container.innerHTML = html;
         }
 
@@ -741,9 +781,9 @@
             const header = document.getElementById('main-header');
             if (header) {
                 if (viewName === 'home') {
-                    header.classList.add('hidden'); header.classList.remove('flex');
+                    header.className = 'hidden';
                 } else {
-                    header.classList.remove('hidden'); header.classList.add('flex');
+                    header.className = 'hidden md:flex justify-between items-center px-6 pt-12 md:pt-6 pb-4 bg-brand-bg border-b border-gray-100';
                 }
             }
 

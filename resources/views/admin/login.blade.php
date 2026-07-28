@@ -25,13 +25,7 @@
     <header
         class="bg-white/80 backdrop-blur-md sticky top-0 z-40 px-6 py-4 flex justify-between items-center border-b border-gray-100 w-full shrink-0">
         <div class="flex items-center gap-3">
-            @if(isset($siteSettings['logo']) && $siteSettings['logo'] != '')
-                <img src="{{ asset($siteSettings['logo']) }}" class="h-10 object-contain" alt="Logo">
-            @else
-                <div class="font-allison text-5xl text-black leading-none pt-2">
-                    {{ substr($siteSettings['restaurant_name'] ?? 'M', 0, 1) }}
-                </div>
-            @endif
+            <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-14 object-contain mix-blend-multiply" alt="Logo">
             <span
                 class="font-serif font-bold text-lg hidden md:block tracking-widest">{{ $siteSettings['restaurant_name'] ?? '' }}</span>
         </div>
@@ -41,9 +35,6 @@
                     Sayfa</span></a>
             <a href="{{ url('/') }}" class="hover:text-[#8C6C47] transition-colors"><span
                     data-i18n="navSearch">Menü</span></a>
-            <a href="{{ url('/') }}" class="hover:text-[#8C6C47] transition-colors flex items-center gap-1.5">
-                <i class="fa-solid fa-basket-shopping"></i> <span>Sepet</span>
-            </a>
             <a href="{{ url('/admin') }}" class="text-[#8C6C47] font-semibold flex items-center gap-1.5">
                 <i class="fa-solid fa-user-lock"></i> <span>Admin</span>
             </a>
@@ -60,7 +51,7 @@
         <div
             class="bg-white p-6 sm:p-10 rounded-2xl sm:rounded-3xl shadow-none sm:shadow-xl w-full max-w-md border-0 sm:border border-gray-100">
             <div class="text-center mb-8">
-                <div class="font-allison text-[4.5rem] sm:text-[6rem] text-[#1C1C1C] leading-none mb-2">M</div>
+                <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-28 mx-auto object-contain mb-4 select-none mix-blend-multiply" alt="Logo">
                 <h1 data-i18n="title" class="text-xl font-semibold text-gray-800 tracking-wide uppercase">Yönetim Paneli
                 </h1>
             </div>
@@ -109,19 +100,15 @@
     <nav
         class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-4 pb-6 flex justify-between items-center text-[10px] sm:text-xs font-medium text-gray-500 z-40 shadow-lg">
         <a href="{{ url('/') }}"
-            class="flex flex-col items-center gap-1 text-gray-500 hover:text-[#8C6C47] transition-colors w-1/4">
+            class="flex flex-col items-center gap-1 text-gray-500 hover:text-[#8C6C47] transition-colors w-1/3">
             <i class="fa-solid fa-house text-lg mb-0.5"></i><span data-i18n="navHome">Ana Sayfa</span>
         </a>
         <a href="{{ url('/') }}"
-            class="flex flex-col items-center gap-1 text-gray-500 hover:text-[#8C6C47] transition-colors w-1/4">
+            class="flex flex-col items-center gap-1 text-gray-500 hover:text-[#8C6C47] transition-colors w-1/3">
             <i class="fa-solid fa-magnifying-glass text-lg mb-0.5"></i><span data-i18n="navSearch">Menü</span>
         </a>
-        <a href="{{ url('/') }}"
-            class="flex flex-col items-center gap-1 text-gray-500 hover:text-[#8C6C47] transition-colors w-1/4">
-            <i class="fa-solid fa-basket-shopping text-lg mb-0.5"></i><span>Sepet</span>
-        </a>
         <a href="{{ url('/admin') }}"
-            class="flex flex-col items-center gap-1 text-[#8C6C47] hover:text-[#8C6C47] transition-colors w-1/4 font-semibold">
+            class="flex flex-col items-center gap-1 text-[#8C6C47] hover:text-[#8C6C47] transition-colors w-1/3 font-semibold">
             <i class="fa-solid fa-user-lock text-lg mb-0.5"></i><span>Admin</span>
         </a>
     </nav>

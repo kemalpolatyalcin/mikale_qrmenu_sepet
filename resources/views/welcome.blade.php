@@ -206,14 +206,8 @@
                 preserveAspectRatio="none" fill="currentColor">
                 <path d="M0,60 C400,160 1000,-40 1440,60 L1440,85 C1000,-15 400,185 0,85 Z"></path>
             </svg>
-            @if(isset($siteSettings['logo']) && $siteSettings['logo'] != '')
-                <img src="{{ asset($siteSettings['logo']) }}" class="relative z-10 anim-logo h-32 object-contain"
-                    alt="Logo">
-            @else
-                <div class="font-allison text-[8rem] text-black relative z-10 anim-logo pr-4 pt-4">
-                    {{ substr($siteSettings['restaurant_name'] ?? 'M', 0, 1) }}
-                </div>
-            @endif
+            <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="relative z-10 anim-logo h-40 object-contain mix-blend-multiply"
+                alt="Logo">
             <svg class="absolute bottom-[30%] left-0 w-full h-16 anim-stripe-bottom text-brand-gold"
                 viewBox="0 0 1440 150" preserveAspectRatio="none" fill="currentColor">
                 <path d="M0,60 C400,160 1000,-40 1440,60 L1440,85 C1000,-15 400,185 0,85 Z"></path>
@@ -223,13 +217,7 @@
         <header id="main-header"
             class="hidden justify-between items-center px-6 pt-12 md:pt-6 pb-4 bg-brand-bg border-b border-gray-100">
             <div class="cursor-pointer flex items-center gap-2" onclick="switchView('home')">
-                @if(isset($siteSettings['logo']) && $siteSettings['logo'] != '')
-                    <img src="{{ asset($siteSettings['logo']) }}" class="h-10 object-contain" alt="Logo">
-                @else
-                    <div class="font-allison text-5xl text-black leading-none pt-2">
-                        {{ substr($siteSettings['restaurant_name'] ?? 'M', 0, 1) }}
-                    </div>
-                @endif
+                <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-14 object-contain mix-blend-multiply" alt="Logo">
                 <span
                     class="font-serif font-bold text-lg hidden md:block tracking-widest">{{ $siteSettings['restaurant_name'] ?? '' }}</span>
             </div>
@@ -237,15 +225,6 @@
             <nav class="hidden md:flex items-center gap-8 font-medium text-sm text-gray-500">
                 <button onclick="switchView('home')" class="hover:text-brand-gold transition-colors">Ana Sayfa</button>
                 <button onclick="switchView('search')" class="hover:text-brand-gold transition-colors">Menü</button>
-                <button onclick="window.dispatchEvent(new CustomEvent('open-cart'))"
-                    class="hover:text-brand-gold transition-colors flex items-center gap-1.5 relative">
-                    <i class="fa-solid fa-basket-shopping"></i>
-                    <span>Sepet</span>
-                    <span id="cart-count-badge"
-                        class="absolute -top-2 -right-3 bg-red-500 text-white rounded-full text-[9px] min-w-[16px] h-4 flex items-center justify-center font-bold px-1 {{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') > 0 ? '' : 'hidden' }}">
-                        {{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') }}
-                    </span>
-                </button>
                 <a href="/admin" target="_blank"
                     class="hover:text-brand-gold transition-colors flex items-center gap-1.5">
                     <i class="fa-solid fa-user-lock"></i> <span>Admin</span>
@@ -296,9 +275,7 @@
 
                 <div class="flex flex-col items-center px-8 pt-4 pb-4 text-center bg-brand-bg">
                     <div class="mb-2">
-                        <div class="font-allison text-[7rem] leading-none text-black select-none">
-                            M
-                        </div>
+                        <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-44 object-contain select-none mix-blend-multiply" alt="Logo">
                     </div>
 
                     <p data-i18n="heroDesc"
@@ -330,16 +307,8 @@
 
                 <div class="flex flex-col gap-4 max-w-2xl mx-auto mb-6">
                     <div class="flex md:hidden items-center justify-between">
-                        <button onclick="window.dispatchEvent(new CustomEvent('open-cart'))"
-                            class="relative text-black text-xl hover:text-brand-gold transition-colors">
-                            <i class="fa-solid fa-basket-shopping"></i>
-                            <span id="cart-count-badge-search"
-                                class="absolute -top-2 -right-2.5 bg-red-500 text-white rounded-full text-[8px] min-w-[14px] h-3.5 flex items-center justify-center font-bold px-0.5 {{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') > 0 ? '' : 'hidden' }}">{{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') }}</span>
-                        </button>
-                        <div class="font-allison text-6xl text-black leading-none pt-2 cursor-pointer select-none"
-                            onclick="switchView('home')">
-                            M
-                        </div>
+                        <div class="w-12"></div>
+                        <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-14 object-contain cursor-pointer mix-blend-multiply" onclick="switchView('home')" alt="Logo">
                         <div class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs font-bold shadow-sm">
                             <span data-i18n="tableLabel">Masa:</span> <span class="current-table-display">-</span>
                         </div>
@@ -400,9 +369,7 @@
                 class="w-full bg-[#151515] text-gray-500 pt-6 pb-24 md:pb-6 px-6 mt-12 border-t border-white/5 text-center shrink-0">
                 <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
                     <div class="flex items-center gap-2 justify-center">
-                        @if(isset($siteSettings['logo']) && $siteSettings['logo'] != '')
-                            <img src="{{ asset($siteSettings['logo']) }}" class="h-6 object-contain" alt="Logo">
-                        @endif
+                        <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-6 object-contain mix-blend-multiply" alt="Logo">
                         <span
                             class="font-bold text-white tracking-wider">{{ $siteSettings['restaurant_name'] ?? '' }}</span>
                     </div>
@@ -424,26 +391,17 @@
         <nav
             class="fixed md:hidden bottom-0 left-0 right-0 w-full bg-white rounded-t-3xl shadow-[0_-5px_15px_rgba(0,0,0,0.05)] px-4 py-4 pb-6 flex justify-between items-center text-[10px] sm:text-xs font-medium text-gray-500 z-50">
             <button onclick="switchView('home')"
-                class="nav-btn active flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-brand-gold w-1/4"
+                class="nav-btn active flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-brand-gold w-1/3"
                 data-target="home">
                 <i class="fa-solid fa-house text-lg mb-0.5"></i><span data-i18n="navHome">Ana Sayfa</span>
             </button>
             <button onclick="switchView('search')"
-                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors w-1/4"
+                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors w-1/3"
                 data-target="search">
                 <i class="fa-solid fa-magnifying-glass text-lg mb-0.5"></i><span data-i18n="navSearch">Menü</span>
             </button>
-            <button onclick="window.dispatchEvent(new CustomEvent('open-cart'))"
-                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-gray-500 w-1/4 relative">
-                <i class="fa-solid fa-basket-shopping text-lg mb-0.5"></i>
-                <span>Sepet</span>
-                <span id="mobile-cart-count-badge"
-                    class="absolute top-2 right-6 bg-red-500 text-white rounded-full text-[8px] min-w-[14px] h-3.5 flex items-center justify-center font-bold px-0.5 {{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') > 0 ? '' : 'hidden' }}">
-                    {{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') }}
-                </span>
-            </button>
             <button onclick="window.open('/admin', '_blank')"
-                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-gray-500 w-1/4">
+                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-gray-500 w-1/3">
                 <i class="fa-solid fa-user-lock text-lg mb-0.5"></i><span>Admin</span>
             </button>
         </nav>
@@ -480,45 +438,14 @@
                     <p id="modal-desc" class="text-sm text-gray-700 leading-relaxed mb-6">Detaylar yükleniyor...</p>
                 </div>
 
-                <div class="p-4 bg-white border-t border-gray-100">
-                    <button id="modal-add-to-cart"
-                        class="w-full py-3 bg-[#8C6C47] hover:bg-[#735738] text-white rounded-xl font-bold transition-colors shadow-md">
-                        Sepete Ekle
-                    </button>
-                </div>
             </div>
         </div>
     </div>
 
-    <livewire:cart-drawer />
     @livewireScripts
 
     <script>
         const currencySymbol = "{{ $siteSettings['currency'] ?? '₺' }}";
-
-        document.addEventListener('livewire:init', () => {
-            Livewire.on('cart-updated', (event) => {
-                let count = 0;
-                if (event && typeof event === 'object') {
-                    if (event.count !== undefined) {
-                        count = event.count;
-                    } else if (Array.isArray(event) && event[0] && event[0].count !== undefined) {
-                        count = event[0].count;
-                    } else if (event.detail && event.detail.count !== undefined) {
-                        count = event.detail.count;
-                    }
-                }
-                const badges = document.querySelectorAll('#cart-count-badge, #mobile-cart-count-badge, #cart-count-badge-search');
-                badges.forEach(badge => {
-                    if (count > 0) {
-                        badge.innerText = count;
-                        badge.classList.remove('hidden');
-                    } else {
-                        badge.classList.add('hidden');
-                    }
-                });
-            });
-        });
 
         const translations = {
             tr: {
@@ -735,9 +662,6 @@
                             </div>
                             <div class="flex justify-between items-center mt-3 pt-2">
                                 <span class="font-extrabold text-gray-900 text-sm">${currencySymbol}${product.price}</span>
-                                <button onclick="event.stopPropagation(); Livewire.dispatch('add-to-cart', { id: ${product.id}, name: '${safeName}', price: ${product.price} })" class="w-8 h-8 flex items-center justify-center bg-[#8C6C47] text-white rounded-full hover:bg-[#735738] transition-colors shadow-sm">
-                                    <i class="fa-solid fa-plus"></i>
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -820,8 +744,7 @@
             document.getElementById('modal-cal').innerHTML = `<i class="fa-solid fa-fire text-orange-400 mr-1"></i> ${product.calories || 0} kcal`;
             document.getElementById('modal-time').innerHTML = `<i class="fa-regular fa-clock mr-1 text-gray-400"></i> ${product.prep_time || 15} dk`;
 
-            const safeName = product.name.replace(/'/g, "\\'");
-            document.getElementById('modal-add-to-cart').setAttribute('onclick', `Livewire.dispatch('add-to-cart', { id: ${product.id}, name: '${safeName}', price: ${product.price} }); closeProductModal();`);
+
 
             document.getElementById('overlay').classList.add('open');
             document.getElementById('product-modal').classList.add('open');

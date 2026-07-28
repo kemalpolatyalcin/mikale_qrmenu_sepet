@@ -41,9 +41,6 @@
                     Sayfa</span></a>
             <a href="{{ url('/') }}" class="hover:text-[#8C6C47] transition-colors"><span
                     data-i18n="navSearch">Menü</span></a>
-            <a href="{{ url('/') }}" class="hover:text-[#8C6C47] transition-colors flex items-center gap-1.5">
-                <i class="fa-solid fa-basket-shopping"></i> <span>Sepet</span>
-            </a>
             <a href="{{ url('/admin') }}" class="text-[#8C6C47] font-semibold flex items-center gap-1.5">
                 <i class="fa-solid fa-user-lock"></i> <span>Admin</span>
             </a>
@@ -109,19 +106,15 @@
     <nav
         class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-4 pb-6 flex justify-between items-center text-[10px] sm:text-xs font-medium text-gray-500 z-40 shadow-lg">
         <a href="{{ url('/') }}"
-            class="flex flex-col items-center gap-1 text-gray-500 hover:text-[#8C6C47] transition-colors w-1/4">
+            class="flex flex-col items-center gap-1 text-gray-500 hover:text-[#8C6C47] transition-colors w-1/3">
             <i class="fa-solid fa-house text-lg mb-0.5"></i><span data-i18n="navHome">Ana Sayfa</span>
         </a>
         <a href="{{ url('/') }}"
-            class="flex flex-col items-center gap-1 text-gray-500 hover:text-[#8C6C47] transition-colors w-1/4">
+            class="flex flex-col items-center gap-1 text-gray-500 hover:text-[#8C6C47] transition-colors w-1/3">
             <i class="fa-solid fa-magnifying-glass text-lg mb-0.5"></i><span data-i18n="navSearch">Menü</span>
         </a>
-        <a href="{{ url('/') }}"
-            class="flex flex-col items-center gap-1 text-gray-500 hover:text-[#8C6C47] transition-colors w-1/4">
-            <i class="fa-solid fa-basket-shopping text-lg mb-0.5"></i><span>Sepet</span>
-        </a>
         <a href="{{ url('/admin') }}"
-            class="flex flex-col items-center gap-1 text-[#8C6C47] hover:text-[#8C6C47] transition-colors w-1/4 font-semibold">
+            class="flex flex-col items-center gap-1 text-[#8C6C47] hover:text-[#8C6C47] transition-colors w-1/3 font-semibold">
             <i class="fa-solid fa-user-lock text-lg mb-0.5"></i><span>Admin</span>
         </a>
     </nav>

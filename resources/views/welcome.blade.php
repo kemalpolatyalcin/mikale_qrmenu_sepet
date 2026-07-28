@@ -187,6 +187,7 @@
             opacity: 1;
             pointer-events: auto;
         }
+
         [x-cloak] {
             display: none !important;
         }
@@ -205,8 +206,14 @@
                 preserveAspectRatio="none" fill="currentColor">
                 <path d="M0,60 C400,160 1000,-40 1440,60 L1440,85 C1000,-15 400,185 0,85 Z"></path>
             </svg>
-            <img src="{{ isset($siteSettings['logo']) && $siteSettings['logo'] != '' ? asset($siteSettings['logo']) : asset('images/oztaylan_logo.jpg') }}" class="relative z-10 anim-logo h-32 w-32 object-contain rounded-full shadow-lg bg-white p-1"
-                alt="Logo">
+            @if(isset($siteSettings['logo']) && $siteSettings['logo'] != '')
+                <img src="{{ asset($siteSettings['logo']) }}" class="relative z-10 anim-logo h-32 object-contain"
+                    alt="Logo">
+            @else
+                <div class="font-allison text-[8rem] text-black relative z-10 anim-logo pr-4 pt-4">
+                    {{ substr($siteSettings['restaurant_name'] ?? 'M', 0, 1) }}
+                </div>
+            @endif
             <svg class="absolute bottom-[30%] left-0 w-full h-16 anim-stripe-bottom text-brand-gold"
                 viewBox="0 0 1440 150" preserveAspectRatio="none" fill="currentColor">
                 <path d="M0,60 C400,160 1000,-40 1440,60 L1440,85 C1000,-15 400,185 0,85 Z"></path>
@@ -216,7 +223,13 @@
         <header id="main-header"
             class="hidden justify-between items-center px-6 pt-12 md:pt-6 pb-4 bg-brand-bg border-b border-gray-100">
             <div class="cursor-pointer flex items-center gap-2" onclick="switchView('home')">
-                <img src="{{ isset($siteSettings['logo']) && $siteSettings['logo'] != '' ? asset($siteSettings['logo']) : asset('images/oztaylan_logo.jpg') }}" class="h-10 w-10 object-contain rounded-full shadow-sm bg-white p-0.5" alt="Logo">
+                @if(isset($siteSettings['logo']) && $siteSettings['logo'] != '')
+                    <img src="{{ asset($siteSettings['logo']) }}" class="h-10 object-contain" alt="Logo">
+                @else
+                    <div class="font-allison text-5xl text-black leading-none pt-2">
+                        {{ substr($siteSettings['restaurant_name'] ?? 'M', 0, 1) }}
+                    </div>
+                @endif
                 <span
                     class="font-serif font-bold text-lg hidden md:block tracking-widest">{{ $siteSettings['restaurant_name'] ?? '' }}</span>
             </div>
@@ -224,6 +237,15 @@
             <nav class="hidden md:flex items-center gap-8 font-medium text-sm text-gray-500">
                 <button onclick="switchView('home')" class="hover:text-brand-gold transition-colors">Ana Sayfa</button>
                 <button onclick="switchView('search')" class="hover:text-brand-gold transition-colors">Menü</button>
+                <button onclick="window.dispatchEvent(new CustomEvent('open-cart'))"
+                    class="hover:text-brand-gold transition-colors flex items-center gap-1.5 relative">
+                    <i class="fa-solid fa-basket-shopping"></i>
+                    <span>Sepet</span>
+                    <span id="cart-count-badge"
+                        class="absolute -top-2 -right-3 bg-red-500 text-white rounded-full text-[9px] min-w-[16px] h-4 flex items-center justify-center font-bold px-1 {{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') > 0 ? '' : 'hidden' }}">
+                        {{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') }}
+                    </span>
+                </button>
                 <a href="/admin" target="_blank"
                     class="hover:text-brand-gold transition-colors flex items-center gap-1.5">
                     <i class="fa-solid fa-user-lock"></i> <span>Admin</span>
@@ -273,8 +295,10 @@
                 </svg>
 
                 <div class="flex flex-col items-center px-8 pt-4 pb-4 text-center bg-brand-bg">
-                    <div class="mb-4">
-                        <img src="{{ isset($siteSettings['logo']) && $siteSettings['logo'] != '' ? asset($siteSettings['logo']) : asset('images/oztaylan_logo.jpg') }}" class="h-28 w-28 object-contain rounded-full shadow-md bg-white border border-gray-100 p-1" alt="Logo">
+                    <div class="mb-2">
+                        <div class="font-allison text-[7rem] leading-none text-black select-none">
+                            M
+                        </div>
                     </div>
 
                     <p data-i18n="heroDesc"
@@ -295,7 +319,8 @@
                 </div>
 
                 <div class="w-full max-w-5xl mx-auto px-6 mt-4">
-                    <h3 class="text-brand-text font-serif font-bold text-base mb-3 tracking-wide text-left">Kategoriler</h3>
+                    <h3 class="text-brand-text font-serif font-bold text-base mb-3 tracking-wide text-left">Kategoriler
+                    </h3>
                     <div id="home-category-list" class="grid grid-cols-1 md:grid-cols-4 gap-4 pb-4">
                     </div>
                 </div>
@@ -305,13 +330,23 @@
 
                 <div class="flex flex-col gap-4 max-w-2xl mx-auto mb-6">
                     <div class="flex md:hidden items-center justify-between">
-                        <img src="{{ isset($siteSettings['logo']) && $siteSettings['logo'] != '' ? asset($siteSettings['logo']) : asset('images/oztaylan_logo.jpg') }}" class="h-10 w-10 object-contain rounded-full shadow-sm bg-white p-0.5 cursor-pointer" onclick="switchView('home')" alt="Logo">
+                        <button onclick="window.dispatchEvent(new CustomEvent('open-cart'))"
+                            class="relative text-black text-xl hover:text-brand-gold transition-colors">
+                            <i class="fa-solid fa-basket-shopping"></i>
+                            <span id="cart-count-badge-search"
+                                class="absolute -top-2 -right-2.5 bg-red-500 text-white rounded-full text-[8px] min-w-[14px] h-3.5 flex items-center justify-center font-bold px-0.5 {{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') > 0 ? '' : 'hidden' }}">{{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') }}</span>
+                        </button>
+                        <div class="font-allison text-6xl text-black leading-none pt-2 cursor-pointer select-none"
+                            onclick="switchView('home')">
+                            M
+                        </div>
                         <div class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs font-bold shadow-sm">
                             <span data-i18n="tableLabel">Masa:</span> <span class="current-table-display">-</span>
                         </div>
                     </div>
                     <div class="flex items-center">
-                        <button onclick="switchView('home')" class="flex items-center gap-1.5 text-sm font-semibold text-gray-700 hover:text-black transition-colors">
+                        <button onclick="switchView('home')"
+                            class="flex items-center gap-1.5 text-sm font-semibold text-gray-700 hover:text-black transition-colors">
                             <i class="fa-solid fa-chevron-left"></i> Geri
                         </button>
                     </div>
@@ -327,8 +362,10 @@
                     </div>
                 @endif
 
-                <div class="relative mb-6 mt-2 max-w-2xl mx-auto flex items-center bg-white border border-gray-300 rounded-full shadow-sm pr-4">
-                    <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 transform -translate-y-1/2 text-black text-lg"></i>
+                <div
+                    class="relative mb-6 mt-2 max-w-2xl mx-auto flex items-center bg-white border border-gray-300 rounded-full shadow-sm pr-4">
+                    <i
+                        class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 transform -translate-y-1/2 text-black text-lg"></i>
                     <input type="text" id="searchInput" oninput="handleSearch(this.value)"
                         data-i18n-placeholder="search" placeholder="Arama...."
                         class="w-full bg-transparent py-3.5 pl-14 pr-12 focus:outline-none text-sm text-black font-poppins font-normal">
@@ -336,7 +373,8 @@
                 </div>
 
                 <div id="category-list" class="hidden">
-                    <p data-i18n="loadingCats" class="text-center text-gray-500 py-4 col-span-full">Kategoriler yükleniyor...</p>
+                    <p data-i18n="loadingCats" class="text-center text-gray-500 py-4 col-span-full">Kategoriler
+                        yükleniyor...</p>
                 </div>
 
                 <div id="dynamic-product-list" class="flex flex-col pb-8 max-w-5xl mx-auto">
@@ -350,27 +388,34 @@
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6" id="products-grid"></div>
 
                     <div class="mt-8 max-w-5xl mx-auto w-full">
-                        <h3 class="font-serif text-2xl md:text-3xl font-semibold text-brand-dark mb-4 text-left">Tavsiye Edilenler</h3>
+                        <h3 class="font-serif text-2xl md:text-3xl font-semibold text-brand-dark mb-4 text-left">Tavsiye
+                            Edilenler</h3>
                         <div class="space-y-4" id="recommended-products-list">
                         </div>
                     </div>
                 </div>
             </div>
 
-            <footer class="w-full bg-[#151515] text-gray-500 pt-6 pb-24 md:pb-6 px-6 mt-12 border-t border-white/5 text-center shrink-0">
+            <footer
+                class="w-full bg-[#151515] text-gray-500 pt-6 pb-24 md:pb-6 px-6 mt-12 border-t border-white/5 text-center shrink-0">
                 <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
                     <div class="flex items-center gap-2 justify-center">
-                        <img src="{{ isset($siteSettings['logo']) && $siteSettings['logo'] != '' ? asset($siteSettings['logo']) : asset('images/oztaylan_logo.jpg') }}" class="h-6 w-6 object-contain rounded-full bg-white p-0.5" alt="Logo">
-                        <span class="font-bold text-white tracking-wider">{{ $siteSettings['restaurant_name'] ?? '' }}</span>
+                        @if(isset($siteSettings['logo']) && $siteSettings['logo'] != '')
+                            <img src="{{ asset($siteSettings['logo']) }}" class="h-6 object-contain" alt="Logo">
+                        @endif
+                        <span
+                            class="font-bold text-white tracking-wider">{{ $siteSettings['restaurant_name'] ?? '' }}</span>
                     </div>
                     <p>&copy; {{ date('Y') }}. Tüm hakları saklıdır.</p>
                     @if(isset($siteSettings['wifi_password']) && $siteSettings['wifi_password'] != '')
                         <p class="flex items-center gap-1.5 justify-center">
-                            <i class="fa-solid fa-wifi text-amber-500"></i> Wi-Fi: <strong class="text-white">{{ $siteSettings['wifi_password'] }}</strong>
+                            <i class="fa-solid fa-wifi text-amber-500"></i> Wi-Fi: <strong
+                                class="text-white">{{ $siteSettings['wifi_password'] }}</strong>
                         </p>
                     @endif
                     <p class="text-[10px] uppercase tracking-wider font-semibold">
-                        Powered by <a href="#" target="_blank" class="hover:text-amber-500 text-gray-400 transition-colors">Mikale QR Menu</a>
+                        Powered by <a href="#" target="_blank"
+                            class="hover:text-amber-500 text-gray-400 transition-colors">Mikale QR Menu</a>
                     </p>
                 </div>
             </footer>
@@ -379,17 +424,26 @@
         <nav
             class="fixed md:hidden bottom-0 left-0 right-0 w-full bg-white rounded-t-3xl shadow-[0_-5px_15px_rgba(0,0,0,0.05)] px-4 py-4 pb-6 flex justify-between items-center text-[10px] sm:text-xs font-medium text-gray-500 z-50">
             <button onclick="switchView('home')"
-                class="nav-btn active flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-brand-gold w-1/3"
+                class="nav-btn active flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-brand-gold w-1/4"
                 data-target="home">
                 <i class="fa-solid fa-house text-lg mb-0.5"></i><span data-i18n="navHome">Ana Sayfa</span>
             </button>
             <button onclick="switchView('search')"
-                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors w-1/3"
+                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors w-1/4"
                 data-target="search">
                 <i class="fa-solid fa-magnifying-glass text-lg mb-0.5"></i><span data-i18n="navSearch">Menü</span>
             </button>
+            <button onclick="window.dispatchEvent(new CustomEvent('open-cart'))"
+                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-gray-500 w-1/4 relative">
+                <i class="fa-solid fa-basket-shopping text-lg mb-0.5"></i>
+                <span>Sepet</span>
+                <span id="mobile-cart-count-badge"
+                    class="absolute top-2 right-6 bg-red-500 text-white rounded-full text-[8px] min-w-[14px] h-3.5 flex items-center justify-center font-bold px-0.5 {{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') > 0 ? '' : 'hidden' }}">
+                    {{ Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') }}
+                </span>
+            </button>
             <button onclick="window.open('/admin', '_blank')"
-                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-gray-500 w-1/3">
+                class="nav-btn flex flex-col items-center gap-1 hover:text-brand-gold transition-colors text-gray-500 w-1/4">
                 <i class="fa-solid fa-user-lock text-lg mb-0.5"></i><span>Admin</span>
             </button>
         </nav>
@@ -425,15 +479,46 @@
 
                     <p id="modal-desc" class="text-sm text-gray-700 leading-relaxed mb-6">Detaylar yükleniyor...</p>
                 </div>
+
+                <div class="p-4 bg-white border-t border-gray-100">
+                    <button id="modal-add-to-cart"
+                        class="w-full py-3 bg-[#8C6C47] hover:bg-[#735738] text-white rounded-xl font-bold transition-colors shadow-md">
+                        Sepete Ekle
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
+    <livewire:cart-drawer />
     @livewireScripts
 
     <script>
         const currencySymbol = "{{ $siteSettings['currency'] ?? '₺' }}";
 
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('cart-updated', (event) => {
+                let count = 0;
+                if (event && typeof event === 'object') {
+                    if (event.count !== undefined) {
+                        count = event.count;
+                    } else if (Array.isArray(event) && event[0] && event[0].count !== undefined) {
+                        count = event[0].count;
+                    } else if (event.detail && event.detail.count !== undefined) {
+                        count = event.detail.count;
+                    }
+                }
+                const badges = document.querySelectorAll('#cart-count-badge, #mobile-cart-count-badge, #cart-count-badge-search');
+                badges.forEach(badge => {
+                    if (count > 0) {
+                        badge.innerText = count;
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                });
+            });
+        });
 
         const translations = {
             tr: {
@@ -543,7 +628,7 @@
                 const imgUrl = cat.image_url || '';
                 const catName = cat.name.toUpperCase();
                 const safeName = catName.replace(/'/g, "\\'");
-                
+
                 const itemHtml = `
                     <div class="w-full h-[110px] rounded-[18px] relative overflow-hidden shadow-sm cursor-pointer hover:opacity-95 transition-opacity" onclick="showProducts(${cat.id}, '${safeName}')">
                         <img src="${imgUrl}" class="absolute inset-0 w-full h-full object-cover" alt="${catName}">
@@ -553,9 +638,9 @@
                         </div>
                     </div>
                 `;
-                
+
                 container.innerHTML += itemHtml;
-                
+
                 if (homeContainer) {
                     const homeItemHtml = `
                         <div class="w-full h-[110px] rounded-[18px] relative overflow-hidden shadow-sm cursor-pointer hover:opacity-95 transition-opacity" onclick="switchView('search'); showProducts(${cat.id}, '${safeName}')">
@@ -650,6 +735,9 @@
                             </div>
                             <div class="flex justify-between items-center mt-3 pt-2">
                                 <span class="font-extrabold text-gray-900 text-sm">${currencySymbol}${product.price}</span>
+                                <button onclick="event.stopPropagation(); Livewire.dispatch('add-to-cart', { id: ${product.id}, name: '${safeName}', price: ${product.price} })" class="w-8 h-8 flex items-center justify-center bg-[#8C6C47] text-white rounded-full hover:bg-[#735738] transition-colors shadow-sm">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -664,7 +752,7 @@
             const container = document.getElementById('recommended-products-list');
             if (!container) return;
             container.innerHTML = '';
-            
+
             const items = allProducts.slice(0, 3);
             let html = '';
             items.forEach(product => {
@@ -672,7 +760,7 @@
                 const safeName = product.name.replace(/'/g, "\\'");
                 const kcalText = product.calories ? `${product.calories} kcal` : '300 kcal';
                 const timeText = product.prep_time ? `${product.prep_time} min` : '35 min';
-                
+
                 html += `
                     <div onclick="openProductModal(${product.id})" class="bg-white rounded-[1.5rem] p-3 shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:shadow-md transition-shadow">
                         <div class="w-20 h-20 rounded-[1rem] overflow-hidden shrink-0 bg-gray-50">
@@ -731,6 +819,9 @@
             document.getElementById('modal-desc').innerText = product.description;
             document.getElementById('modal-cal').innerHTML = `<i class="fa-solid fa-fire text-orange-400 mr-1"></i> ${product.calories || 0} kcal`;
             document.getElementById('modal-time').innerHTML = `<i class="fa-regular fa-clock mr-1 text-gray-400"></i> ${product.prep_time || 15} dk`;
+
+            const safeName = product.name.replace(/'/g, "\\'");
+            document.getElementById('modal-add-to-cart').setAttribute('onclick', `Livewire.dispatch('add-to-cart', { id: ${product.id}, name: '${safeName}', price: ${product.price} }); closeProductModal();`);
 
             document.getElementById('overlay').classList.add('open');
             document.getElementById('product-modal').classList.add('open');

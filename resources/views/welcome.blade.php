@@ -240,10 +240,10 @@
         <main class="flex-1 overflow-y-auto no-scrollbar bg-brand-bg flex flex-col justify-between">
 
             <div id="view-home" class="page-view active w-full relative">
-                <div class="relative w-full h-[340px] md:h-[60vh] rounded-b-[2rem] overflow-hidden">
-                    <img src="{{ isset($siteSettings['cover_image']) && $siteSettings['cover_image'] != '' ? asset($siteSettings['cover_image']) : asset('images/background.jpg') }}"
-                        class="w-full h-full object-cover" alt="">
-                    <div class="absolute inset-0 bg-gradient-to-t from-brand-bg from-5% via-black/40 to-black/30"></div>
+                <div class="relative w-full h-[340px] md:h-[60vh] rounded-b-[2rem] overflow-hidden bg-white">
+                    <img src="{{ isset($siteSettings['cover_image']) && $siteSettings['cover_image'] != '' ? asset($siteSettings['cover_image']) : asset('images/oztaylan_logo.jpg') }}"
+                        class="w-full h-full object-contain py-16 px-8 mix-blend-multiply" alt="">
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-bg from-5% via-transparent to-transparent"></div>
 
                     <div class="absolute top-4 md:top-6 right-6 flex items-center gap-3 z-20">
                         <div
@@ -260,12 +260,6 @@
                         </div>
                     </div>
 
-                    <div class="absolute bottom-12 left-0 w-full text-center z-10 px-4">
-                        <h1
-                            class="text-[36px] md:text-[50px] font-poppins font-normal text-white leading-tight drop-shadow-md">
-                            {!! $siteSettings['slogan'] ?? 'Harika Tatlar,<br>Güzel Anılar...' !!}
-                        </h1>
-                    </div>
                 </div>
 
                 <svg class="w-full h-12 text-[#8C6C47] -mt-6 relative z-10 drop-shadow-sm" viewBox="0 0 1440 150"
@@ -274,9 +268,10 @@
                 </svg>
 
                 <div class="flex flex-col items-center px-8 pt-4 pb-4 text-center bg-brand-bg">
-                    <div class="mb-2">
-                        <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-44 object-contain select-none mix-blend-multiply" alt="Logo">
-                    </div>
+                    <h1
+                        class="text-[32px] md:text-[45px] font-serif font-bold italic text-brand-gold leading-tight mb-4 max-w-xl">
+                        {!! $siteSettings['slogan'] ?? 'Harika Tatlar,<br>Güzel Anılar...' !!}
+                    </h1>
 
                     <p data-i18n="heroDesc"
                         class="text-[18px] md:text-[21px] font-poppins font-normal text-brand-text mb-6 md:mb-10 leading-snug max-w-2xl px-4">
@@ -298,7 +293,7 @@
                 <div class="w-full max-w-5xl mx-auto px-6 mt-4">
                     <h3 class="text-brand-text font-serif font-bold text-base mb-3 tracking-wide text-left">Kategoriler
                     </h3>
-                    <div id="home-category-list" class="grid grid-cols-1 md:grid-cols-4 gap-4 pb-4">
+                    <div id="home-category-list" class="grid grid-cols-2 md:grid-cols-4 gap-4 pb-4">
                     </div>
                 </div>
             </div>
@@ -341,7 +336,7 @@
                     <i class="fa-solid fa-sliders text-black text-lg cursor-pointer"></i>
                 </div>
 
-                <div id="category-list" class="hidden">
+                <div id="category-list" class="hidden grid grid-cols-2 md:grid-cols-4 gap-4 pb-4">
                     <p data-i18n="loadingCats" class="text-center text-gray-500 py-4 col-span-full">Kategoriler
                         yükleniyor...</p>
                 </div>
@@ -368,8 +363,7 @@
             <footer
                 class="w-full bg-[#151515] text-gray-500 pt-6 pb-24 md:pb-6 px-6 mt-12 border-t border-white/5 text-center shrink-0">
                 <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
-                    <div class="flex items-center gap-2 justify-center">
-                        <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-6 object-contain mix-blend-multiply" alt="Logo">
+                    <div class="flex items-center justify-center">
                         <span
                             class="font-bold text-white tracking-wider">{{ $siteSettings['restaurant_name'] ?? '' }}</span>
                     </div>

@@ -47,7 +47,12 @@ class AdminController extends Controller
     public function categories()
     {
         $restaurantId = $this->getActiveRestaurantId();
-        $categories = Schema::hasTable('categories') ? Category::where('restaurant_id', $restaurantId)->orderBy('id', 'desc')->get() : collect();
+        if (Schema::hasTable('categories')) {
+            $allCategories = Category::where('restaurant_id', $restaurantId)->get();
+            $categories = $this->buildCategoryTree($allCategories);
+        } else {
+            $categories = collect();
+        }
         return view('admin.categories', compact('categories'));
     }
 
@@ -55,12 +60,32 @@ class AdminController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'parent_id' => 'nullable|integer|exists:categories,id',
+            'parent_name' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
         ]);
 
+        $restaurantId = $this->getActiveRestaurantId();
+        $parentId = null;
+
+        if ($request->filled('parent_name')) {
+            $parent = Category::where('name', $request->parent_name)->where('restaurant_id', $restaurantId)->first();
+            if (!$parent) {
+                $parent = new Category();
+                $parent->name = $request->parent_name;
+                $parent->restaurant_id = $restaurantId;
+                $parent->image_url = '';
+                $parent->save();
+            }
+            $parentId = $parent->id;
+        } else {
+            $parentId = $request->filled('parent_id') ? $request->parent_id : null;
+        }
+
         $category = new Category();
         $category->name = $request->name;
-        $category->restaurant_id = $this->getActiveRestaurantId();
+        $category->parent_id = $parentId;
+        $category->restaurant_id = $restaurantId;
 
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
@@ -76,8 +101,34 @@ class AdminController extends Controller
 
     public function updateCategory(Request $request, $id)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'parent_id' => 'nullable|integer|exists:categories,id',
+            'parent_name' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
+        ]);
+
         $category = Category::findOrFail($id);
         $category->name = $request->name;
+
+        $restaurantId = $this->getActiveRestaurantId();
+        if ($request->filled('parent_name')) {
+            if ($request->parent_name !== $category->name) {
+                $parent = Category::where('name', $request->parent_name)->where('restaurant_id', $restaurantId)->first();
+                if (!$parent) {
+                    $parent = new Category();
+                    $parent->name = $request->parent_name;
+                    $parent->restaurant_id = $restaurantId;
+                    $parent->image_url = '';
+                    $parent->save();
+                }
+                $category->parent_id = $parent->id;
+            }
+        } else {
+            if ($request->has('parent_id') && $request->parent_id != $id) {
+                $category->parent_id = $request->filled('parent_id') ? $request->parent_id : null;
+            }
+        }
 
         if ($request->hasFile('image')) {
             if ($category->image_url && File::exists(public_path($category->image_url))) {
@@ -90,6 +141,21 @@ class AdminController extends Controller
 
         $category->save();
         return redirect()->back()->with('success', 'Kategori başarıyla güncellendi!');
+    }
+
+    private function buildCategoryTree($categories, $parentId = null, $depth = 0)
+    {
+        $branch = collect();
+        $filtered = $categories->where('parent_id', $parentId)->sortBy('name');
+        foreach ($filtered as $category) {
+            $category->depth = $depth;
+            $branch->push($category);
+            $children = $this->buildCategoryTree($categories, $category->id, $depth + 1);
+            foreach ($children as $child) {
+                $branch->push($child);
+            }
+        }
+        return $branch;
     }
 
     public function deleteCategory($id)
@@ -132,7 +198,12 @@ class AdminController extends Controller
     {
         $restaurantId = $this->getActiveRestaurantId();
         $products = Schema::hasTable('products') ? Product::where('restaurant_id', $restaurantId)->orderBy('id', 'desc')->get() : collect();
-        $categories = Schema::hasTable('categories') ? Category::where('restaurant_id', $restaurantId)->get() : collect();
+        if (Schema::hasTable('categories')) {
+            $allCategories = Category::where('restaurant_id', $restaurantId)->get();
+            $categories = $this->buildCategoryTree($allCategories);
+        } else {
+            $categories = collect();
+        }
         return view('admin.products', compact('products', 'categories'));
     }
 
@@ -144,6 +215,7 @@ class AdminController extends Controller
             'price' => 'required|numeric',
             'description' => 'nullable|string',
             'calories' => 'nullable|integer',
+            'prep_time' => 'nullable|integer',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
         ]);
 
@@ -153,6 +225,7 @@ class AdminController extends Controller
         $product->price = $request->price;
         $product->description = $request->description;
         $product->calories = $request->calories ?? 0;
+        $product->prep_time = $request->prep_time ?? 15;
         $product->is_gluten_free = $request->has('is_gluten_free') ? 1 : 0;
         $product->restaurant_id = $this->getActiveRestaurantId();
 
@@ -166,6 +239,7 @@ class AdminController extends Controller
 
         $product->save();
         if ($request->wantsJson()) {
+            $product->load('category.parent');
             return response()->json([
                 'status' => 'success',
                 'message' => 'Ürün başarıyla eklendi!',
@@ -182,7 +256,8 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'price' => 'required|numeric',
             'description' => 'nullable|string',
-            'calories' => 'nullable|integer'
+            'calories' => 'nullable|integer',
+            'prep_time' => 'nullable|integer'
         ]);
 
         $product = Product::findOrFail($id);
@@ -191,6 +266,7 @@ class AdminController extends Controller
         $product->price = $request->price;
         $product->description = $request->description;
         $product->calories = $request->calories ?? 0;
+        $product->prep_time = $request->prep_time ?? 15;
         $product->is_gluten_free = $request->has('is_gluten_free') ? 1 : 0;
 
         if ($request->hasFile('image')) {

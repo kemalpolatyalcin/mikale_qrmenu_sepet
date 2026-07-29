@@ -84,6 +84,24 @@
                             </div>
 
                             <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Üst Kategori Seçin</label>
+                                <select name="parent_id" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#8C6C47] focus:border-[#8C6C47] outline-none transition-all text-sm">
+                                    <option value="">Ana Kategori (Yok)</option>
+                                    @foreach($categories as $parentCat)
+                                        <option value="{{ $parentCat->id }}">
+                                            {{ str_repeat(' ↳ ', $parentCat->depth) }}{{ $parentCat->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Veya Yeni Üst Kategori Adı Yazın</label>
+                                <input type="text" name="parent_name" placeholder="Örn: Kebaplar"
+                                    class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#8C6C47] focus:border-[#8C6C47] outline-none transition-all text-sm">
+                            </div>
+
+                            <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Kategori Görseli</label>
                                 <input type="file" name="image" accept="image/*"
                                     class="w-full px-4 py-2 rounded-xl border border-gray-300 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-[#8C6C47] hover:file:bg-amber-100 transition-all cursor-pointer">
@@ -116,11 +134,11 @@
                                                     alt="{{ $category->name }}" class="w-full h-full object-cover">
                                             </div>
                                         </td>
-                                        <td class="p-4 font-medium text-gray-800">{{ $category->name }}</td>
+                                        <td class="p-4 font-medium text-gray-800">{{ str_repeat(' ↳ ', $category->depth) }}{{ $category->name }}</td>
                                         <td class="p-4 text-right space-x-2">
 
                                             <button
-                                                onclick="openEditModal({{ $category->id }}, '{{ addslashes($category->name) }}')"
+                                                onclick="openEditModal({{ $category->id }}, '{{ addslashes($category->name) }}', '{{ $category->parent_id }}')"
                                                 class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors">
                                                 <i class="fa-solid fa-pen text-xs"></i>
                                             </button>
@@ -167,6 +185,24 @@
                     </div>
 
                     <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Üst Kategori Seçin</label>
+                        <select id="edit-parent-id" name="parent_id" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#8C6C47] focus:border-[#8C6C47] outline-none transition-all text-sm">
+                            <option value="">Ana Kategori (Yok)</option>
+                            @foreach($categories as $parentCat)
+                                <option value="{{ $parentCat->id }}">
+                                    {{ str_repeat(' ↳ ', $parentCat->depth) }}{{ $parentCat->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Veya Yeni Üst Kategori Adı Yazın</label>
+                        <input type="text" id="edit-parent-name" name="parent_name" placeholder="Örn: Kebaplar"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#8C6C47] focus:border-[#8C6C47] outline-none transition-all text-sm">
+                    </div>
+
+                    <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Yeni Görsel Seçin</label>
                         <input type="file" name="image" accept="image/*"
                             class="w-full px-4 py-2 rounded-xl border border-gray-300 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-[#8C6C47] hover:file:bg-amber-100 transition-all cursor-pointer">
@@ -185,18 +221,31 @@
     </main>
 
     <script>
-        function openEditModal(id, currentName) {
+        function openEditModal(id, currentName, parentId) {
 
             const form = document.getElementById('edit-form');
             form.action = `/admin/categories/update/${id}`;
 
             document.getElementById('edit-name').value = currentName;
 
+            const select = document.getElementById('edit-parent-id');
+            select.value = parentId || '';
+            for (let option of select.options) {
+                option.disabled = (option.value == id);
+            }
+
+            document.getElementById('edit-parent-name').value = '';
+
             const modal = document.getElementById('edit-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
         function closeEditModal() {
+            const select = document.getElementById('edit-parent-id');
+            for (let option of select.options) {
+                option.disabled = false;
+            }
+            document.getElementById('edit-parent-name').value = '';
             const modal = document.getElementById('edit-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');

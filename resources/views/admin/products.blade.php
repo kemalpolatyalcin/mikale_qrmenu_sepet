@@ -74,6 +74,7 @@
                     <thead class="bg-gray-50 border-b border-gray-100">
                         <tr>
                             <th class="p-4 text-xs font-semibold text-gray-600">Ürün</th>
+                            <th class="p-4 text-xs font-semibold text-gray-600">Kategori</th>
                             <th class="p-4 text-xs font-semibold text-gray-600">Fiyat</th>
                             <th class="p-4 text-xs font-semibold text-gray-600 text-right">İşlemler</th>
                         </tr>
@@ -95,6 +96,18 @@
                                                 </p>
                                             </div>
                                         </td>
+                                        <td class="p-4 text-xs text-gray-600">
+                                            @if($product->category)
+                                                @if($product->category->parent)
+                                                    <span class="text-gray-400 text-[10px] block">{{ $product->category->parent->name }}</span>
+                                                    <span class="font-medium">{{ $product->category->name }}</span>
+                                                @else
+                                                    <span class="font-medium text-gray-700">{{ $product->category->name }}</span>
+                                                @endif
+                                            @else
+                                                <span class="text-gray-400 italic">Kategorisiz</span>
+                                            @endif
+                                        </td>
                                         <td class="p-4 font-semibold text-[#8C6C47] text-sm">₺{{ $product->price }}</td>
                                         <td class="p-4 text-right space-x-1">
                                             <button onclick="openEditProductModal({{ json_encode($product) }})"
@@ -108,7 +121,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="3" class="p-8 text-center text-gray-500">Hiç ürün eklenmemiş.</td>
+                                        <td colspan="4" class="p-8 text-center text-gray-500">Hiç ürün eklenmemiş.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -134,7 +147,7 @@
                         <select name="category_id" required
                             class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm">
                             <option value="" disabled selected>Kategori Seçin...</option>
-                            @foreach($categories as $cat) <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                            @foreach($categories as $cat) <option value="{{ $cat->id }}">{{ str_repeat(' ↳ ', $cat->depth ?? 0) }}{{ $cat->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -143,12 +156,15 @@
                         <input type="text" name="name" required placeholder="Örn: Cheddar Burger"
                             class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm">
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><label class="block text-xs font-medium text-gray-700 mb-1">Fiyat (₺)</label><input
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <div class="col-span-1"><label class="block text-xs font-medium text-gray-700 mb-1">Fiyat (₺)</label><input
                                 type="number" name="price" required placeholder="150"
                                 class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm"></div>
-                        <div><label class="block text-xs font-medium text-gray-700 mb-1">Kalori (kcal)</label><input
+                        <div class="col-span-1"><label class="block text-xs font-medium text-gray-700 mb-1">Kalori (kcal)</label><input
                                 type="number" name="calories" placeholder="450"
+                                class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm"></div>
+                        <div class="col-span-2 sm:col-span-1"><label class="block text-xs font-medium text-gray-700 mb-1">Hazırlama (dk)</label><input
+                                type="number" name="prep_time" placeholder="15" value="15"
                                 class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm"></div>
                     </div>
                     <div>
@@ -186,7 +202,7 @@
                         <label class="block text-xs font-medium text-gray-700 mb-1">Kategori</label>
                         <select id="edit-category-id" name="category_id" required
                             class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm">
-                            @foreach($categories as $cat) <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                            @foreach($categories as $cat) <option value="{{ $cat->id }}">{{ str_repeat(' ↳ ', $cat->depth ?? 0) }}{{ $cat->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -195,12 +211,15 @@
                         <input type="text" id="edit-product-name" name="name" required
                             class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm">
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><label class="block text-xs font-medium text-gray-700 mb-1">Fiyat (₺)</label><input
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <div class="col-span-1"><label class="block text-xs font-medium text-gray-700 mb-1">Fiyat (₺)</label><input
                                 type="number" id="edit-product-price" name="price" required
                                 class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm"></div>
-                        <div><label class="block text-xs font-medium text-gray-700 mb-1">Kalori (kcal)</label><input
+                        <div class="col-span-1"><label class="block text-xs font-medium text-gray-700 mb-1">Kalori (kcal)</label><input
                                 type="number" id="edit-product-calories" name="calories"
+                                class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm"></div>
+                        <div class="col-span-2 sm:col-span-1"><label class="block text-xs font-medium text-gray-700 mb-1">Hazırlama (dk)</label><input
+                                type="number" id="edit-product-prep-time" name="prep_time"
                                 class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm"></div>
                     </div>
                     <div>
@@ -245,6 +264,7 @@
             document.getElementById('edit-product-name').value = product.name;
             document.getElementById('edit-product-price').value = product.price;
             document.getElementById('edit-product-calories').value = product.calories;
+            document.getElementById('edit-product-prep-time').value = product.prep_time || 15;
             document.getElementById('edit-product-desc').value = product.description;
             document.getElementById('edit-product-gf').checked = product.is_gluten_free == 1;
 
@@ -316,6 +336,9 @@
                                             </p>
                                             <p class="text-xs text-gray-500 line-clamp-1 w-48">${result.product.description || ''}</p>
                                         </div>
+                                    </td>
+                                    <td class="p-4 text-xs text-gray-600">
+                                        ${result.product.category ? (result.product.category.parent ? `<span class="text-gray-400 text-[10px] block">${result.product.category.parent.name}</span><span class="font-medium">${result.product.category.name}</span>` : `<span class="font-medium text-gray-700">${result.product.category.name}</span>`) : '<span class="text-gray-400 italic">Kategorisiz</span>'}
                                     </td>
                                     <td class="p-4 font-semibold text-[#8C6C47] text-sm">₺${result.product.price}</td>
                                     <td class="p-4 text-right space-x-1">

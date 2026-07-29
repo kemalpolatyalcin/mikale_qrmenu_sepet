@@ -291,8 +291,12 @@
                 </div>
 
                 <div class="w-full max-w-5xl mx-auto px-6 mt-4">
-                    <h3 class="text-brand-text font-serif font-bold text-base mb-3 tracking-wide text-left">Kategoriler
-                    </h3>
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-brand-text font-serif font-bold text-base tracking-wide text-left">Kategoriler</h3>
+                        <button id="category-back-btn" onclick="goBackCategory()" class="hidden text-sm font-semibold text-[#8C6C47] hover:text-black flex items-center gap-1.5 transition-colors">
+                            <i class="fa-solid fa-chevron-left"></i> Üst Kategori
+                        </button>
+                    </div>
                     <div id="home-category-list" class="grid grid-cols-2 md:grid-cols-4 gap-4 pb-4">
                     </div>
                 </div>
@@ -316,6 +320,11 @@
                     </div>
                 </div>
 
+                <div class="w-full max-w-2xl mx-auto mb-6">
+                    <div id="menu-main-categories" class="flex overflow-x-auto gap-3 no-scrollbar pb-1 w-full scroll-smooth">
+                    </div>
+                </div>
+
                 @if(isset($siteSettings['wifi_password']) && $siteSettings['wifi_password'] != '')
                     <div class="max-w-2xl mx-auto mb-4 text-center">
                         <div
@@ -336,6 +345,16 @@
                     <i class="fa-solid fa-sliders text-black text-lg cursor-pointer"></i>
                 </div>
 
+                <div id="subcategories-container" class="w-full max-w-2xl mx-auto mb-6 hidden">
+                    <div class="flex items-start gap-4">
+                        <button onclick="switchView('home')" class="w-10 h-10 rounded-full bg-gray-600 hover:bg-[#8C6C47] text-white flex items-center justify-center transition-colors shrink-0 shadow-sm">
+                            <i class="fa-solid fa-chevron-left text-sm"></i>
+                        </button>
+                        <div id="subcategories-list" class="flex-1 bg-white rounded-2xl border border-gray-100 overflow-hidden divide-y divide-gray-100 shadow-sm">
+                        </div>
+                    </div>
+                </div>
+
                 <div id="category-list" class="hidden grid grid-cols-2 md:grid-cols-4 gap-4 pb-4">
                     <p data-i18n="loadingCats" class="text-center text-gray-500 py-4 col-span-full">Kategoriler
                         yükleniyor...</p>
@@ -347,7 +366,6 @@
                             <h3 id="dynamic-products-title"
                                 class="font-serif text-2xl md:text-3xl font-semibold text-brand-dark"></h3>
                         </div>
-                        <div class="flex overflow-x-auto no-scrollbar gap-2 pb-2" id="category-tabs"></div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6" id="products-grid"></div>
 
@@ -519,7 +537,8 @@
                 hideSplashScreen();
                 if (catResult && catResult.status === 'success') {
                     window.appCategories = catResult.data;
-                    renderCategories(catResult.data);
+                    renderCategoriesAtLevel(null);
+                    renderMainCategoryTabs();
                 } else {
                     window.appCategories = [
                         { id: 1, name: 'BAŞLANGIÇ', image_url: 'images/baslangic.jpg' },
@@ -527,7 +546,8 @@
                         { id: 3, name: 'KEBAP', image_url: 'images/kebap.webp' },
                         { id: 4, name: 'İÇECEKLER', image_url: 'images/kahve.png' }
                     ];
-                    renderCategories(window.appCategories);
+                    renderCategoriesAtLevel(null);
+                    renderMainCategoryTabs();
                 }
                 if (window.appCategories && window.appCategories.length > 0) {
                     showProducts(window.appCategories[0].id, window.appCategories[0].name);
@@ -535,23 +555,42 @@
             }).catch(() => {
                 hideSplashScreen();
                 window.appCategories = [];
-                renderCategories([]);
+                renderCategoriesAtLevel(null);
+                renderMainCategoryTabs();
             });
         });
 
-        function renderCategories(categories) {
+        window.currentParentCategoryId = null;
+
+        function renderCategoriesAtLevel(parentId = null) {
             const container = document.getElementById('category-list');
             const homeContainer = document.getElementById('home-category-list');
-            container.innerHTML = '';
+            if (container) container.innerHTML = '';
             if (homeContainer) homeContainer.innerHTML = '';
 
-            categories.forEach(cat => {
+            const filteredCats = window.appCategories.filter(c => {
+                if (parentId === null) {
+                    return c.parent_id === null || c.parent_id === "" || c.parent_id === undefined;
+                }
+                return c.parent_id == parentId;
+            });
+
+            const backBtn = document.getElementById('category-back-btn');
+            if (backBtn) {
+                if (parentId !== null) {
+                    backBtn.classList.remove('hidden');
+                } else {
+                    backBtn.classList.add('hidden');
+                }
+            }
+
+            filteredCats.forEach(cat => {
                 const imgUrl = cat.image_url || '';
                 const catName = cat.name.toUpperCase();
                 const safeName = catName.replace(/'/g, "\\'");
 
-                const itemHtml = `
-                    <div class="w-full h-[110px] rounded-[18px] relative overflow-hidden shadow-sm cursor-pointer hover:opacity-95 transition-opacity" onclick="showProducts(${cat.id}, '${safeName}')">
+                const homeItemHtml = `
+                    <div class="w-full h-[110px] rounded-[18px] relative overflow-hidden shadow-sm cursor-pointer hover:opacity-95 transition-opacity" onclick="handleCategoryClick(${cat.id}, '${safeName}')">
                         <img src="${imgUrl}" class="absolute inset-0 w-full h-full object-cover" alt="${catName}">
                         <div class="absolute inset-0 bg-gradient-to-r from-black/95 via-black/50 to-transparent"></div>
                         <div class="absolute inset-y-0 left-6 flex items-center z-10">
@@ -560,42 +599,141 @@
                     </div>
                 `;
 
-                container.innerHTML += itemHtml;
-
                 if (homeContainer) {
-                    const homeItemHtml = `
-                        <div class="w-full h-[110px] rounded-[18px] relative overflow-hidden shadow-sm cursor-pointer hover:opacity-95 transition-opacity" onclick="switchView('search'); showProducts(${cat.id}, '${safeName}')">
-                            <img src="${imgUrl}" class="absolute inset-0 w-full h-full object-cover" alt="${catName}">
-                            <div class="absolute inset-0 bg-gradient-to-r from-black/95 via-black/50 to-transparent"></div>
-                            <div class="absolute inset-y-0 left-6 flex items-center z-10">
-                                <h3 class="text-white font-serif text-[1.1rem] tracking-wide uppercase">${catName}</h3>
-                            </div>
-                        </div>
-                    `;
                     homeContainer.innerHTML += homeItemHtml;
+                }
+                if (container) {
+                    container.innerHTML += homeItemHtml;
                 }
             });
         }
 
-        function showProducts(catId, catName) {
+        function handleCategoryClick(catId, catName) {
+            const hasChildren = window.appCategories.some(c => c.parent_id == catId);
+            if (hasChildren) {
+                window.currentParentCategoryId = catId;
+                renderCategoriesAtLevel(catId);
+            } else {
+                switchView('search');
+                showProducts(catId, catName);
+            }
+        }
+
+        function goBackCategory() {
+            if (window.currentParentCategoryId === null) return;
+            const currentCat = window.appCategories.find(c => c.id == window.currentParentCategoryId);
+            const parentId = currentCat ? currentCat.parent_id : null;
+            window.currentParentCategoryId = parentId;
+            renderCategoriesAtLevel(parentId);
+        }
+
+        function getCategoryIdsRecursive(catId) {
+            let ids = [Number(catId)];
+            const children = window.appCategories.filter(c => c.parent_id == catId);
+            children.forEach(child => {
+                ids = ids.concat(getCategoryIdsRecursive(child.id));
+            });
+            return ids;
+        }
+
+        window.activeRootCategoryId = null;
+
+        function renderMainCategoryTabs() {
+            const container = document.getElementById('menu-main-categories');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const rootCategories = window.appCategories.filter(c => c.parent_id === null || c.parent_id === "" || c.parent_id === undefined);
+
+            rootCategories.forEach(cat => {
+                const imgUrl = cat.image_url || 'images/placeholder.jpg';
+                const catName = cat.name.toUpperCase();
+                const safeName = catName.replace(/'/g, "\\'");
+                
+                const isCurrentlyActive = (cat.id == window.activeRootCategoryId);
+                const activeClass = isCurrentlyActive ? 'border-2 border-[#8C6C47] scale-[1.03] shadow-sm' : 'border border-gray-200 opacity-75';
+
+                const itemHtml = `
+                    <div onclick="selectMainCategory(${cat.id}, '${safeName}')" class="min-w-[130px] h-[65px] rounded-[12px] relative overflow-hidden shrink-0 cursor-pointer hover:opacity-90 transition-all ${activeClass}">
+                        <img src="/${imgUrl}" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/45 flex items-center justify-center p-2 text-center">
+                            <span class="text-white font-serif font-bold text-[10px] uppercase tracking-wider leading-tight">${catName}</span>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += itemHtml;
+            });
+        }
+
+        function selectMainCategory(catId, catName) {
+            window.activeRootCategoryId = catId;
+            renderMainCategoryTabs();
+
+            const children = window.appCategories.filter(c => c.parent_id == catId);
+            if (children.length > 0) {
+                const firstChild = children[0];
+                selectSubcategory(firstChild.id, firstChild.name, catId);
+            } else {
+                document.getElementById('subcategories-container').classList.add('hidden');
+                showProductsDirectly(catId, catName);
+            }
+        }
+
+        function selectSubcategory(subId, subName, parentId) {
+            window.activeRootCategoryId = parentId;
+            renderMainCategoryTabs();
+
+            const container = document.getElementById('subcategories-container');
+            const list = document.getElementById('subcategories-list');
+            
+            container.classList.remove('hidden');
+            list.innerHTML = '';
+
+            const children = window.appCategories.filter(c => c.parent_id == parentId);
+            children.forEach(child => {
+                const isActive = (child.id == subId);
+                const activeClass = isActive ? 'bg-gray-50 text-[#8C6C47] border-l-4 border-[#8C6C47] pl-5 font-bold' : 'bg-white text-gray-700 pl-6';
+                
+                list.innerHTML += `
+                    <div onclick="selectSubcategory(${child.id}, '${child.name.replace(/'/g, "\\'")}', ${parentId})" 
+                         class="py-4 font-semibold text-sm cursor-pointer hover:bg-gray-50 transition-colors uppercase ${activeClass}">
+                        ${child.name}
+                    </div>
+                `;
+            });
+
+            showProductsDirectly(subId, subName);
+        }
+
+        function showProductsDirectly(catId, catName) {
             activeCategoryId = catId;
             document.getElementById('searchInput').value = '';
             document.getElementById('category-list').classList.add('hidden');
             document.getElementById('dynamic-product-list').classList.remove('hidden');
             document.getElementById('dynamic-product-list').classList.add('flex');
 
-            let tabsHtml = '';
-            window.appCategories.forEach(c => {
-                let nameStr = c.name || '';
-                let displayTitle = nameStr.charAt(0).toUpperCase() + nameStr.slice(1).toLowerCase();
-                let isActive = c.id == catId ? 'bg-[#8C6C47] text-white shadow-sm border-[#8C6C47]' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50';
-                let safeName = nameStr.replace(/'/g, "\\'");
-                tabsHtml += `<button onclick="showProducts(${c.id}, '${safeName}')" class="px-5 py-2.5 whitespace-nowrap rounded-xl border font-semibold text-sm transition-colors ${isActive}">${displayTitle}</button>`;
-            });
-            document.getElementById('category-tabs').innerHTML = tabsHtml;
+            const allowedCatIds = getCategoryIdsRecursive(catId);
+            const currentCat = window.appCategories.find(c => c.id == catId);
+            if (currentCat && currentCat.parent_id) {
+                const parentCat = window.appCategories.find(c => c.id == currentCat.parent_id);
+                if (parentCat && parentCat.name.toLowerCase() === currentCat.name.toLowerCase()) {
+                    allowedCatIds.push(Number(parentCat.id));
+                }
+            }
 
-            const filtered = allProducts.filter(p => p.category_id == catId);
+            const filtered = allProducts.filter(p => allowedCatIds.includes(Number(p.category_id)));
             renderProducts(filtered, catName);
+        }
+
+        function showProducts(catId, catName) {
+            const currentCat = window.appCategories.find(c => c.id == catId);
+            if (!currentCat) return;
+
+            if (currentCat.parent_id) {
+                selectSubcategory(catId, catName, currentCat.parent_id);
+            } else {
+                selectMainCategory(catId, catName);
+            }
         }
 
         function handleSearch(val) {
@@ -618,7 +756,6 @@
             );
 
             const searchTitle = translations[currentLang].searchResults;
-            document.getElementById('category-tabs').innerHTML = `<div class="px-5 py-2.5 whitespace-nowrap rounded-xl border border-gray-200 font-semibold text-sm bg-[#8C6C47] text-white shadow-sm">${searchTitle}: "${val}"</div>`;
             renderProducts(filtered, searchTitle);
         }
 

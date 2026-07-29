@@ -560,6 +560,14 @@
             });
         });
 
+        function getImageUrl(url) {
+            if (!url) return '/images/placeholder.jpg';
+            if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/')) {
+                return url;
+            }
+            return '/' + url;
+        }
+
         window.currentParentCategoryId = null;
 
         function renderCategoriesAtLevel(parentId = null) {
@@ -585,7 +593,7 @@
             }
 
             filteredCats.forEach(cat => {
-                const imgUrl = cat.image_url || '';
+                const imgUrl = getImageUrl(cat.image_url);
                 const catName = cat.name.toUpperCase();
                 const safeName = catName.replace(/'/g, "\\'");
 
@@ -646,7 +654,7 @@
             const rootCategories = window.appCategories.filter(c => c.parent_id === null || c.parent_id === "" || c.parent_id === undefined);
 
             rootCategories.forEach(cat => {
-                const imgUrl = cat.image_url || 'images/placeholder.jpg';
+                const imgUrl = getImageUrl(cat.image_url);
                 const catName = cat.name.toUpperCase();
                 const safeName = catName.replace(/'/g, "\\'");
                 
@@ -655,7 +663,7 @@
 
                 const itemHtml = `
                     <div onclick="selectMainCategory(${cat.id}, '${safeName}')" class="min-w-[130px] h-[65px] rounded-[12px] relative overflow-hidden shrink-0 cursor-pointer hover:opacity-90 transition-all ${activeClass}">
-                        <img src="/${imgUrl}" class="absolute inset-0 w-full h-full object-cover">
+                        <img src="${imgUrl}" class="absolute inset-0 w-full h-full object-cover">
                         <div class="absolute inset-0 bg-black/45 flex items-center justify-center p-2 text-center">
                             <span class="text-white font-serif font-bold text-[10px] uppercase tracking-wider leading-tight">${catName}</span>
                         </div>
@@ -772,7 +780,7 @@
             let html = '';
 
             products.forEach(product => {
-                const imgUrl = product.image_url || '';
+                const imgUrl = getImageUrl(product.image_url);
                 const safeName = product.name.replace(/'/g, "\\'");
                 const kcalText = product.calories ? `${product.calories} kcal` : '250 kcal';
                 const timeText = product.prep_time ? `${product.prep_time} min` : '15 min';
@@ -811,7 +819,7 @@
             const items = allProducts.slice(0, 3);
             let html = '';
             items.forEach(product => {
-                const imgUrl = product.image_url || '';
+                const imgUrl = getImageUrl(product.image_url);
                 const safeName = product.name.replace(/'/g, "\\'");
                 const kcalText = product.calories ? `${product.calories} kcal` : '300 kcal';
                 const timeText = product.prep_time ? `${product.prep_time} min` : '35 min';
@@ -868,7 +876,7 @@
             const product = allProducts.find(p => p.id == productId);
             if (!product) return;
 
-            document.getElementById('modal-image').src = product.image_url || '';
+            document.getElementById('modal-image').src = getImageUrl(product.image_url);
             document.getElementById('modal-title').innerText = product.name;
             document.getElementById('modal-price').innerText = `${currencySymbol}${product.price}`;
             document.getElementById('modal-desc').innerText = product.description;

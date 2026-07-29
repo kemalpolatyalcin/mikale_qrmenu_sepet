@@ -24,7 +24,7 @@
     </script>
     @livewireStyles
 </head>
-<body class="bg-slate-900 m-0 p-0 font-sans">
+<body class="bg-brand-bg m-0 p-0 font-sans">
 
     <livewire:manager-dashboard />
 

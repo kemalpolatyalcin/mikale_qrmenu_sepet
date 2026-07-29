@@ -8,15 +8,21 @@
                 <p class="text-sm text-gray-500">Restoranınızdaki masaları yönetin ve müşterileriniz için sipariş QR kodları
                     oluşturun.</p>
             </div>
-            <form action="{{ route('admin.tables.store') }}" method="POST" class="flex gap-2">
-                @csrf
-                <input type="text" name="name" placeholder="Örn: Teras 1, Masa 5" required
-                    class="bg-white border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:border-[#8C6C47] text-sm min-w-[200px]">
-                <button type="submit"
-                    class="bg-[#1C1C1C] hover:bg-[#8C6C47] text-white font-medium py-2 px-4 rounded-xl transition-colors shadow-sm text-sm whitespace-nowrap">
-                    <i class="fa-solid fa-plus mr-1"></i> Masa Ekle
+            <div class="flex flex-wrap items-center gap-3">
+                <form action="{{ route('admin.tables.store') }}" method="POST" class="flex gap-2">
+                    @csrf
+                    <input type="text" name="name" placeholder="Örn: Teras 1, Masa 5" required
+                        class="bg-white border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:border-[#8C6C47] text-sm min-w-[200px]">
+                    <button type="submit"
+                        class="bg-[#1C1C1C] hover:bg-[#8C6C47] text-white font-medium py-2 px-4 rounded-xl transition-colors shadow-sm text-sm whitespace-nowrap">
+                        <i class="fa-solid fa-plus mr-1"></i> Masa Ekle
+                    </button>
+                </form>
+                <button type="button" id="refresh-connection-btn" onclick="refreshDesktopConnection()"
+                    class="bg-[#8C6C47] hover:bg-[#735738] text-white font-medium py-2 px-4 rounded-xl transition-colors shadow-sm text-sm flex items-center gap-1.5 whitespace-nowrap">
+                    <i class="fa-solid fa-rotate"></i> Bağlantıyı Yenile
                 </button>
-            </form>
+            </div>
         </div>
 
         @if(session('success'))
@@ -42,7 +48,7 @@
                     </form>
 
                     <div
-                        class="w-16 h-16 bg-amber-50 text-[#8C6C47] rounded-full flex items-center justify-center text-2xl mb-4 border border-amber-100">
+                        class="w-16 h-16 bg-[#8C6C47]/10 text-[#8C6C47] rounded-full flex items-center justify-center text-2xl mb-4 border border-[#8C6C47]/20">
                         <i class="fa-solid fa-chair"></i>
                     </div>
 
@@ -56,7 +62,7 @@
 
                     <form action="{{ route('admin.tables.reset', $table->id) }}" method="POST" class="w-full mb-3">
                         @csrf
-                        <button type="submit" class="w-full bg-amber-50 hover:bg-[#8C6C47] text-[#8C6C47] hover:text-white border border-amber-100 rounded-xl py-2 text-xs font-semibold transition-all">
+                        <button type="submit" class="w-full bg-[#8C6C47]/10 hover:bg-[#8C6C47] text-[#8C6C47] hover:text-white border border-[#8C6C47]/20 rounded-xl py-2 text-xs font-semibold transition-all">
                             <i class="fa-solid fa-rotate mr-1"></i> Masayı Sıfırla (Çıkış)
                         </button>
                     </form>
@@ -79,4 +85,37 @@
             @endforelse
         </div>
     </div>
+
+    <script>
+        function refreshDesktopConnection() {
+            const btn = document.getElementById('refresh-connection-btn');
+            const icon = btn.querySelector('i');
+            icon.classList.add('fa-spin');
+            btn.disabled = true;
+
+            const token = localStorage.getItem('admin_token');
+
+            fetch('/api/sync/status', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                icon.classList.remove('fa-spin');
+                btn.disabled = false;
+                if (data.status === 'success') {
+                    alert('Masaüstü bağlantısı başarıyla yenilendi.');
+                } else {
+                    alert('Masaüstü bağlantısı yenilenemedi.');
+                }
+            })
+            .catch(() => {
+                icon.classList.remove('fa-spin');
+                btn.disabled = false;
+                alert('Masaüstü bağlantısı yenilenirken bir hata oluştu.');
+            });
+        }
+    </script>
 @endsection

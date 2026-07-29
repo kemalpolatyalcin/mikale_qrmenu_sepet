@@ -35,11 +35,11 @@
     </style>
 </head>
 
-<body class="bg-[#F9F9F9] font-poppins flex h-screen w-full overflow-hidden">
+<body class="bg-[#F9F8F3] font-poppins flex h-screen w-full overflow-hidden">
 
     @include('admin.partials.sidebar')
 
-    <div class="flex-1 flex flex-col h-screen min-w-0 bg-[#F9F9F9]">
+    <div class="flex-1 flex flex-col h-screen min-w-0 bg-[#F9F8F3]">
 
         <header
             class="md:hidden h-16 w-full bg-white border-b border-gray-100 px-6 flex items-center justify-between shrink-0 z-20">

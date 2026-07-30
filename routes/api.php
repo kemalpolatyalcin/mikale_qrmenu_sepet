@@ -11,7 +11,11 @@ Route::get('/categories', [MenuController::class, 'getCategories']);
 Route::get('/user', [MenuController::class, 'getUser']);
 Route::get('/tables/{token}', [MenuController::class, 'getTable']);
 
-Route::post('/admin/login', [AdminAuthController::class, 'login']);
+Route::post('/admin/login', [AdminAuthController::class, 'login'])->middleware([
+    \Illuminate\Cookie\Middleware\EncryptCookies::class,
+    \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+    \Illuminate\Session\Middleware\StartSession::class,
+]);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/logout', [AdminAuthController::class, 'logout']);

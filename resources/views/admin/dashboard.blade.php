@@ -37,7 +37,11 @@
                 class="text-gray-800 text-2xl focus:outline-none">
                 <i class="fa-solid fa-bars"></i>
             </button>
-            <div class="font-allison text-3xl text-black leading-none">M</div>
+            @if(isset($activeRestaurant) && $activeRestaurant->logo_url)
+                <img src="{{ asset($activeRestaurant->logo_url) }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white" alt="Restaurant Logo">
+            @else
+                <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white mix-blend-multiply" alt="Restaurant Logo">
+            @endif
         </header>
 
         <header
@@ -46,7 +50,7 @@
             <div class="flex items-center gap-4">
                 <div
                     class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-bold border-2 border-[#8C6C47]">
-                    {{ substr(optional(Auth::user())->full_name ?? optional(Auth::user())->name ?? 'A', 0, 1) }}
+                    {{ mb_substr(optional(Auth::user())->full_name ?? optional(Auth::user())->name ?? 'A', 0, 1, 'UTF-8') }}
                 </div>
                 <div class="hidden sm:block text-sm">
                     <p class="font-bold text-gray-800">{{ optional(Auth::user())->full_name ?? optional(Auth::user())->name ?? 'Yönetici' }}
@@ -57,6 +61,39 @@
         </header>
 
         <div class="p-8">
+            @if((session('is_developer') || (auth()->check() && auth()->user() && auth()->user()->email === 'mikale@gmail.com')) && isset($restaurantsList) && $restaurantsList->count() > 0)
+            <div class="mb-8">
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-hotel text-[#8C6C47]"></i>
+                    <span>Yapılandırılacak Restoranı Seçin</span>
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    @foreach($restaurantsList as $res)
+                        <form action="{{ route('admin.restaurants.select') }}" method="POST" class="m-0 cursor-pointer" id="select-res-card-{{ $res->id }}">
+                            @csrf
+                            <input type="hidden" name="restaurant_id" value="{{ $res->id }}">
+                            <div onclick="document.getElementById('select-res-card-{{ $res->id }}').submit()" class="bg-white p-6 rounded-2xl border transition-all {{ (isset($activeRestaurant) && $activeRestaurant->id == $res->id) ? 'border-2 border-[#8C6C47] shadow-md scale-[1.01]' : 'border-gray-100 hover:border-[#8C6C47] shadow-sm hover:shadow-md' }}">
+                                <div class="flex items-center justify-between mb-4">
+                                    @if($res->logo_url)
+                                        <img src="{{ asset($res->logo_url) }}" class="w-12 h-12 object-contain rounded-xl border border-gray-100 bg-white" alt="Logo">
+                                    @else
+                                        <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-[#8C6C47] text-xl font-bold">
+                                            {{ mb_substr($res->name, 0, 1, 'UTF-8') }}
+                                        </div>
+                                    @endif
+                                    @if(isset($activeRestaurant) && $activeRestaurant->id == $res->id)
+                                        <span class="bg-amber-100 text-[#8C6C47] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Aktif</span>
+                                    @endif
+                                </div>
+                                <h4 class="font-bold text-gray-800 text-base mb-1">{{ $res->name }}</h4>
+                                <p class="text-xs text-gray-400">Bu restoranın menüsünü ve masalarını yapılandırmak için tıklayın.</p>
+                            </div>
+                        </form>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">

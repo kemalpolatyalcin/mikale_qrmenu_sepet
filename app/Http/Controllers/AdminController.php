@@ -28,10 +28,13 @@ class AdminController extends Controller
                 return $restaurantId;
             }
         }
-        $default = Restaurant::first();
-        if ($default) {
-            session(['active_restaurant_id' => $default->id]);
-            return $default->id;
+
+        if (!session('is_developer')) {
+            $default = Restaurant::first();
+            if ($default) {
+                session(['active_restaurant_id' => $default->id]);
+                return $default->id;
+            }
         }
         return null;
     }
@@ -517,6 +520,10 @@ class AdminController extends Controller
     {
         $request->validate(['restaurant_id' => 'required|integer|exists:restaurants,id']);
         session(['active_restaurant_id' => $request->restaurant_id]);
+        
+        if (url()->previous() === route('admin.developer.select_restaurant')) {
+            return redirect()->route('admin.dashboard');
+        }
         return redirect()->back()->with('success', 'Aktif restoran değiştirildi.');
     }
 
@@ -575,5 +582,40 @@ class AdminController extends Controller
         ];
 
         return view('admin.register', compact('transactions', 'totals', 'startDate', 'endDate'));
+    }
+
+    public function updateLoginDetails(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            $token = $request->bearerToken();
+            if ($token) {
+                $user = \App\Models\User::where('api_token', $token)->first();
+            }
+        }
+        if (!$user) {
+            return redirect('/login');
+        }
+        $request->validate([
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|min:6'
+        ]);
+
+        $user->email = $request->email;
+        if ($request->password) {
+            $user->password = \Illuminate\Support\Facades\Hash::make($request->password);
+        }
+        $user->save();
+
+        return redirect()->back()->with('success', 'Giriş bilgileriniz başarıyla güncellendi.');
+    }
+
+    public function showSelectRestaurant()
+    {
+        if (!session('is_developer')) {
+            return redirect('/login');
+        }
+        $restaurants = Restaurant::all();
+        return view('admin.select-restaurant', compact('restaurants'));
     }
 }

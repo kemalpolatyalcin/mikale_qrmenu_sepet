@@ -37,7 +37,11 @@
                 class="text-gray-800 text-2xl focus:outline-none">
                 <i class="fa-solid fa-bars"></i>
             </button>
-            <div class="font-allison text-3xl text-black leading-none">M</div>
+            @if(isset($activeRestaurant) && $activeRestaurant->logo_url)
+                <img src="{{ asset($activeRestaurant->logo_url) }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white" alt="Restaurant Logo">
+            @else
+                <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white mix-blend-multiply" alt="Restaurant Logo">
+            @endif
         </header>
 
         <div class="flex-1 overflow-y-auto no-scrollbar">

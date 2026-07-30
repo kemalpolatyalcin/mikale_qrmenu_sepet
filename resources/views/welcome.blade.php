@@ -218,8 +218,6 @@
             class="hidden justify-between items-center px-6 pt-12 md:pt-6 pb-4 bg-brand-bg border-b border-gray-100">
             <div class="cursor-pointer flex items-center gap-2" onclick="switchView('home')">
                 <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-14 object-contain mix-blend-multiply" alt="Logo">
-                <span
-                    class="font-serif font-bold text-lg hidden md:block tracking-widest">{{ $siteSettings['restaurant_name'] ?? '' }}</span>
             </div>
 
             <nav class="hidden md:flex items-center gap-8 font-medium text-sm text-gray-500">
@@ -232,6 +230,7 @@
             </nav>
 
             <div class="flex items-center gap-4 text-sm font-semibold">
+
                 <div class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs font-bold shadow-sm"><span
                         data-i18n="tableLabel">Masa:</span> <span class="current-table-display">-</span></div>
             </div>
@@ -308,6 +307,7 @@
                     <div class="flex md:hidden items-center justify-between">
                         <div class="w-12"></div>
                         <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-14 object-contain cursor-pointer mix-blend-multiply" onclick="switchView('home')" alt="Logo">
+
                         <div class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs font-bold shadow-sm">
                             <span data-i18n="tableLabel">Masa:</span> <span class="current-table-display">-</span>
                         </div>
@@ -346,11 +346,11 @@
                 </div>
 
                 <div id="subcategories-container" class="w-full max-w-2xl mx-auto mb-6 hidden">
-                    <div class="flex items-start gap-4">
+                    <div class="flex items-center gap-3">
                         <button onclick="switchView('home')" class="w-10 h-10 rounded-full bg-gray-600 hover:bg-[#8C6C47] text-white flex items-center justify-center transition-colors shrink-0 shadow-sm">
                             <i class="fa-solid fa-chevron-left text-sm"></i>
                         </button>
-                        <div id="subcategories-list" class="flex-1 bg-white rounded-2xl border border-gray-100 overflow-hidden divide-y divide-gray-100 shadow-sm">
+                        <div id="subcategories-list" class="flex-1 flex overflow-x-auto gap-2.5 no-scrollbar pb-1 scroll-smooth">
                         </div>
                     </div>
                 </div>
@@ -594,7 +594,7 @@
 
             filteredCats.forEach(cat => {
                 const imgUrl = getImageUrl(cat.image_url);
-                const catName = cat.name.toUpperCase();
+                const catName = cat.name.trim().toUpperCase();
                 const safeName = catName.replace(/'/g, "\\'");
 
                 const homeItemHtml = `
@@ -655,7 +655,7 @@
 
             rootCategories.forEach(cat => {
                 const imgUrl = getImageUrl(cat.image_url);
-                const catName = cat.name.toUpperCase();
+                const catName = cat.name.trim().toUpperCase();
                 const safeName = catName.replace(/'/g, "\\'");
                 
                 const isCurrentlyActive = (cat.id == window.activeRootCategoryId);
@@ -679,8 +679,7 @@
 
             const children = window.appCategories.filter(c => c.parent_id == catId);
             if (children.length > 0) {
-                const firstChild = children[0];
-                selectSubcategory(firstChild.id, firstChild.name, catId);
+                selectSubcategory(catId, catName, catId);
             } else {
                 document.getElementById('subcategories-container').classList.add('hidden');
                 showProductsDirectly(catId, catName);
@@ -697,18 +696,34 @@
             container.classList.remove('hidden');
             list.innerHTML = '';
 
+            const parentCat = window.appCategories.find(c => c.id == parentId);
             const children = window.appCategories.filter(c => c.parent_id == parentId);
+            
             children.forEach(child => {
                 const isActive = (child.id == subId);
-                const activeClass = isActive ? 'bg-gray-50 text-[#8C6C47] border-l-4 border-[#8C6C47] pl-5 font-bold' : 'bg-white text-gray-700 pl-6';
+                const activeClass = isActive ? 'border-2 border-[#8C6C47] text-[#8C6C47] font-bold shadow-sm' : 'border border-gray-200 text-gray-700 hover:bg-gray-50';
+                const trimmedName = child.name.trim();
                 
                 list.innerHTML += `
                     <div onclick="selectSubcategory(${child.id}, '${child.name.replace(/'/g, "\\'")}', ${parentId})" 
-                         class="py-4 font-semibold text-sm cursor-pointer hover:bg-gray-50 transition-colors uppercase ${activeClass}">
-                        ${child.name}
+                         class="bg-white rounded-[12px] h-[50px] px-5 flex items-center justify-center text-xs font-bold uppercase tracking-wider cursor-pointer whitespace-nowrap transition-all ${activeClass}">
+                        ${trimmedName}
                     </div>
                 `;
             });
+
+            if (parentCat) {
+                const isActive = (parentId == subId);
+                const activeClass = isActive ? 'border-2 border-[#8C6C47] text-[#8C6C47] font-bold shadow-sm' : 'border border-gray-200 text-gray-700 hover:bg-gray-50';
+                const trimmedParentName = parentCat.name.trim();
+                
+                list.innerHTML += `
+                    <div onclick="selectSubcategory(${parentCat.id}, '${parentCat.name.replace(/'/g, "\\'")}', ${parentId})" 
+                         class="bg-white rounded-[12px] h-[50px] px-5 flex items-center justify-center text-xs font-bold uppercase tracking-wider cursor-pointer whitespace-nowrap transition-all ${activeClass}">
+                        ${trimmedParentName}
+                    </div>
+                `;
+            }
 
             showProductsDirectly(subId, subName);
         }
@@ -724,7 +739,7 @@
             const currentCat = window.appCategories.find(c => c.id == catId);
             if (currentCat && currentCat.parent_id) {
                 const parentCat = window.appCategories.find(c => c.id == currentCat.parent_id);
-                if (parentCat && parentCat.name.toLowerCase() === currentCat.name.toLowerCase()) {
+                if (parentCat && parentCat.name.trim().toLowerCase() === currentCat.name.trim().toLowerCase()) {
                     allowedCatIds.push(Number(parentCat.id));
                 }
             }

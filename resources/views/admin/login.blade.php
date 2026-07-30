@@ -24,34 +24,26 @@
 
     <header
         class="bg-white/80 backdrop-blur-md sticky top-0 z-40 px-6 py-4 flex justify-between items-center border-b border-gray-100 w-full shrink-0">
-        <div class="flex items-center gap-3">
-            <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-14 object-contain mix-blend-multiply" alt="Logo">
+        <div class="flex items-center gap-3 w-1/4">
             <span
                 class="font-serif font-bold text-lg hidden md:block tracking-widest">{{ $siteSettings['restaurant_name'] ?? '' }}</span>
         </div>
 
-        <nav class="hidden md:flex items-center gap-8 font-medium text-sm text-gray-500">
-            <a href="{{ url('/') }}" class="hover:text-[#8C6C47] transition-colors"><span data-i18n="navHome">Ana
-                    Sayfa</span></a>
-            <a href="{{ url('/') }}" class="hover:text-[#8C6C47] transition-colors"><span
-                    data-i18n="navSearch">Menü</span></a>
+        <nav class="hidden md:flex items-center gap-8 font-medium text-sm text-gray-500 justify-center">
+            <a href="{{ url('/') }}" class="hover:text-[#8C6C47] transition-colors"><span data-i18n="navHome">Ana Sayfa</span></a>
+            <a href="{{ url('/') }}" class="hover:text-[#8C6C47] transition-colors"><span data-i18n="navSearch">Menü</span></a>
             <a href="{{ url('/admin') }}" class="text-[#8C6C47] font-semibold flex items-center gap-1.5">
                 <i class="fa-solid fa-user-lock"></i> <span>Admin</span>
             </a>
         </nav>
 
-        <div class="flex items-center gap-4 text-sm font-semibold">
-            <div class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs font-bold shadow-sm">
-                <span data-i18n="tableLabel">Masa:</span> <span class="current-table-display">-</span>
-            </div>
-        </div>
+        <div class="w-1/4 hidden md:block"></div>
     </header>
 
     <div class="flex-1 flex items-center justify-center p-4 pb-24 md:pb-4">
         <div
             class="bg-white p-6 sm:p-10 rounded-2xl sm:rounded-3xl shadow-none sm:shadow-xl w-full max-w-md border-0 sm:border border-gray-100">
             <div class="text-center mb-8">
-                <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-28 mx-auto object-contain mb-4 select-none mix-blend-multiply" alt="Logo">
                 <h1 data-i18n="title" class="text-xl font-semibold text-gray-800 tracking-wide uppercase">Yönetim Paneli
                 </h1>
             </div>
@@ -209,6 +201,7 @@
 
                         if (response.ok && result.status === 'success') {
                             localStorage.setItem('admin_token', result.token);
+                            document.cookie = "admin_token=" + result.token + "; path=/; max-age=31536000";
                             window.location.href = '/admin/products';
                         } else {
                             if (!errorContainer) {

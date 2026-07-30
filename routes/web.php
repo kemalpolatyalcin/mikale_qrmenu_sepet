@@ -22,7 +22,12 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
         }
     }
     if (!$restaurant) {
-        $restaurant = \App\Models\Restaurant::first();
+        if (session()->has('active_restaurant_id')) {
+            $restaurant = \App\Models\Restaurant::find(session('active_restaurant_id'));
+        }
+        if (!$restaurant) {
+            $restaurant = \App\Models\Restaurant::first();
+        }
     }
 
     $siteSettings = [];
@@ -47,7 +52,9 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
         $siteSettings = \App\Models\Setting::pluck('value', 'key')->toArray();
     }
 
-    return view('welcome', compact('siteSettings'));
+    $restaurants = \App\Models\Restaurant::all();
+
+    return view('welcome', compact('siteSettings', 'restaurants'));
 });
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -55,40 +62,46 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::middleware('developer.restaurant')->group(function () {
 
-    Route::get('/', [AdminController::class, 'index'])->name('dashboard');
+    Route::prefix('admin')->name('admin.')->group(function () {
 
-    Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
-    Route::post('/settings', [AdminController::class, 'updateSettings'])->name('settings.update');
+        Route::get('/', [AdminController::class, 'index'])->name('dashboard');
 
-    Route::get('/categories', [AdminController::class, 'categories'])->name('categories');
-    Route::post('/categories/store', [AdminController::class, 'storeCategory'])->name('categories.store');
-    Route::post('/categories/update/{id}', [AdminController::class, 'updateCategory'])->name('categories.update');
-    Route::get('/categories/delete/{id}', [AdminController::class, 'deleteCategory'])->name('categories.delete');
+        Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
+        Route::post('/settings', [AdminController::class, 'updateSettings'])->name('settings.update');
+        Route::post('/settings/login', [AdminController::class, 'updateLoginDetails'])->name('settings.login.update');
 
-    Route::get('/products', [AdminController::class, 'products'])->name('products');
-    Route::post('/products/store', [AdminController::class, 'storeProduct'])->name('products.store');
-    Route::post('/products/update/{id}', [AdminController::class, 'updateProduct'])->name('products.update');
-    Route::get('/products/delete/{id}', [AdminController::class, 'deleteProduct'])->name('products.delete');
+        Route::get('/categories', [AdminController::class, 'categories'])->name('categories');
+        Route::post('/categories/store', [AdminController::class, 'storeCategory'])->name('categories.store');
+        Route::post('/categories/update/{id}', [AdminController::class, 'updateCategory'])->name('categories.update');
+        Route::get('/categories/delete/{id}', [AdminController::class, 'deleteCategory'])->name('categories.delete');
 
-    Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
-    Route::get('/register', [AdminController::class, 'register'])->name('register');
+        Route::get('/products', [AdminController::class, 'products'])->name('products');
+        Route::post('/products/store', [AdminController::class, 'storeProduct'])->name('products.store');
+        Route::post('/products/update/{id}', [AdminController::class, 'updateProduct'])->name('products.update');
+        Route::get('/products/delete/{id}', [AdminController::class, 'deleteProduct'])->name('products.delete');
 
-    Route::get('/tables', [AdminController::class, 'tables'])->name('tables');
-    Route::post('/tables', [AdminController::class, 'storeTable'])->name('tables.store');
-    Route::delete('/tables/{id}', [AdminController::class, 'deleteTable'])->name('tables.delete');
-    Route::post('/tables/reset/{id}', [AdminController::class, 'resetTable'])->name('tables.reset');
+        Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
+        Route::get('/register', [AdminController::class, 'register'])->name('register');
 
-    Route::post('/restaurants/select', [AdminController::class, 'selectRestaurant'])->name('restaurants.select');
-    Route::get('/api/new-orders-check', [AdminController::class, 'checkNewOrders'])->name('api.new-orders-check');
-});
+        Route::get('/tables', [AdminController::class, 'tables'])->name('tables');
+        Route::post('/tables', [AdminController::class, 'storeTable'])->name('tables.store');
+        Route::delete('/tables/{id}', [AdminController::class, 'deleteTable'])->name('tables.delete');
+        Route::post('/tables/reset/{id}', [AdminController::class, 'resetTable'])->name('tables.reset');
 
-Route::name('admin.')->group(function () {
-    Route::get('/developer/restaurants', [AdminController::class, 'developerRestaurants'])->name('developer.restaurants');
-    Route::post('/developer/restaurants/store', [AdminController::class, 'storeRestaurant'])->name('restaurants.store');
-    Route::post('/developer/restaurants/update/{id}', [AdminController::class, 'updateRestaurant'])->name('restaurants.update');
-    Route::get('/developer/restaurants/delete/{id}', [AdminController::class, 'deleteRestaurant'])->name('restaurants.delete');
+        Route::post('/restaurants/select', [AdminController::class, 'selectRestaurant'])->name('restaurants.select');
+        Route::get('/api/new-orders-check', [AdminController::class, 'checkNewOrders'])->name('api.new-orders-check');
+    });
+
+    Route::name('admin.')->group(function () {
+        Route::get('/developer/select-restaurant', [AdminController::class, 'showSelectRestaurant'])->name('developer.select_restaurant');
+        Route::get('/developer/restaurants', [AdminController::class, 'developerRestaurants'])->name('developer.restaurants');
+        Route::post('/developer/restaurants/store', [AdminController::class, 'storeRestaurant'])->name('restaurants.store');
+        Route::post('/developer/restaurants/update/{id}', [AdminController::class, 'updateRestaurant'])->name('restaurants.update');
+        Route::get('/developer/restaurants/delete/{id}', [AdminController::class, 'deleteRestaurant'])->name('restaurants.delete');
+    });
+
 });
 
 Route::post('/api/login', [AuthController::class, 'apiLogin']);

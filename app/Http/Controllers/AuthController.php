@@ -16,9 +16,9 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         if ($request->input('is_developer') == '1') {
-            if ($request->input('email') === 'developer@gmail.com' && $request->input('password') === '123456') {
+            if ($request->input('email') === 'mikale@gmail.com' && $request->input('password') === '123456') {
                 $user = \App\Models\User::firstOrCreate(
-                    ['email' => 'developer@gmail.com'],
+                    ['email' => 'mikale@gmail.com'],
                     [
                         'name' => 'Developer',
                         'password' => bcrypt('123456')
@@ -27,11 +27,8 @@ class AuthController extends Controller
                 Auth::login($user);
                 $request->session()->regenerate();
                 session(['is_developer' => true]);
-                $default = \App\Models\Restaurant::first();
-                if ($default) {
-                    session(['active_restaurant_id' => $default->id]);
-                }
-                return redirect()->route('admin.dashboard');
+                session()->forget('active_restaurant_id');
+                return redirect()->route('admin.developer.select_restaurant');
             }
             return back()->withErrors([
                 'email' => 'Geliştirici giriş bilgileri hatalı.',
@@ -87,9 +84,9 @@ class AuthController extends Controller
             ]);
         }
 
-        if ($request->email === 'developer@gmail.com' && $request->password === '123456') {
+        if ($request->email === 'mikale@gmail.com' && $request->password === '123456') {
             $user = \App\Models\User::firstOrCreate(
-                ['email' => 'developer@gmail.com'],
+                ['email' => 'mikale@gmail.com'],
                 [
                     'name' => 'Developer',
                     'password' => bcrypt('123456')

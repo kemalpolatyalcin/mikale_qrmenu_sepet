@@ -14,6 +14,12 @@
             </div>
         @endif
 
+        @if($errors->any())
+            <div class="bg-red-50 text-red-700 p-4 rounded-xl mb-6 border border-red-100 flex items-center gap-3">
+                <i class="fa-solid fa-triangle-exclamation"></i> {{ $errors->first() }}
+            </div>
+        @endif
+
         <form id="settings-form" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             <input type="hidden" name="delete_logo" id="delete-logo-input" value="0">
@@ -108,6 +114,32 @@
                     <button type="submit"
                         class="bg-[#1C1C1C] hover:bg-[#8C6C47] text-white font-medium py-3 px-8 rounded-xl transition-colors shadow-md flex items-center gap-2">
                         <i class="fa-solid fa-floppy-disk"></i> Değişiklikleri Kaydet
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <form action="{{ route('admin.settings.login.update') }}" method="POST" class="mt-8 space-y-6">
+            @csrf
+            <div class="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100">
+                <h2 class="text-lg font-bold text-gray-800 mb-6 border-b pb-2"><i
+                        class="fa-solid fa-user-lock text-[#8C6C47] mr-2"></i>Giriş Bilgileri</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">E-posta Adresi</label>
+                        <input type="email" name="email" value="{{ optional(auth()->user())->email }}" required
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8C6C47] transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Yeni Şifre (Değiştirmek istemiyorsanız boş bırakın)</label>
+                        <input type="password" name="password" placeholder="••••••••"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8C6C47] transition-all">
+                    </div>
+                </div>
+                <div class="mt-8 pt-4 border-t border-gray-100 flex justify-end">
+                    <button type="submit"
+                        class="bg-[#1C1C1C] hover:bg-[#8C6C47] text-white font-medium py-3 px-8 rounded-xl transition-colors shadow-md flex items-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Giriş Bilgilerini Güncelle
                     </button>
                 </div>
             </div>

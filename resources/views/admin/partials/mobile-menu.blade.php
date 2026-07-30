@@ -10,28 +10,28 @@
                     class="text-gray-500 text-xl focus:outline-none"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            @if(session('is_developer') && isset($restaurantsList) && $restaurantsList->count() > 0)
-            <div class="px-2 mb-4">
-                <form action="{{ route('admin.restaurants.select') }}" method="POST" id="restaurant-select-form-mobile">
-                    @csrf
-                    <label class="text-[9px] uppercase font-bold text-gray-400 tracking-wider block mb-1">Aktif Restoran</label>
-                    <select name="restaurant_id" onchange="document.getElementById('restaurant-select-form-mobile').submit()" 
-                        class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold text-gray-700 focus:outline-none focus:border-[#8C6C47] transition-all">
-                        @foreach($restaurantsList as $res)
-                            <option value="{{ $res->id }}" {{ isset($activeRestaurant) && $activeRestaurant->id == $res->id ? 'selected' : '' }}>
-                                {{ $res->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </form>
-            </div>
-            @endif
-
             <nav class="space-y-3">
+                @if((session('is_developer') || (auth()->check() && auth()->user() && auth()->user()->email === 'mikale@gmail.com')) && isset($restaurantsList) && $restaurantsList->count() > 0)
+                <div class="mb-4">
+                    <label class="text-[9px] uppercase font-bold text-gray-400 tracking-wider block mb-1.5 px-2">Restoranlar</label>
+                    <div class="space-y-1 max-h-32 overflow-y-auto border border-gray-100 rounded-xl p-1.5 bg-gray-50/50">
+                        @foreach($restaurantsList as $res)
+                            <form action="{{ route('admin.restaurants.select') }}" method="POST" class="m-0">
+                                @csrf
+                                <input type="hidden" name="restaurant_id" value="{{ $res->id }}">
+                                <button type="submit" class="w-full text-left px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all {{ (isset($activeRestaurant) && $activeRestaurant->id == $res->id) ? 'bg-[#8C6C47] text-white shadow-sm font-bold' : 'text-gray-600 hover:bg-gray-100' }}">
+                                    {{ $res->name }}
+                                </button>
+                            </form>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
                 <a href="{{ url('/') }}" target="_blank"
                     class="flex items-center gap-3 px-4 py-3 text-[#8C6C47] bg-amber-50 rounded-xl font-medium text-sm">
                     <i class="fa-solid fa-arrow-up-right-from-square w-5 text-center"></i> Menüyü Görüntüle
                 </a>
+
                 <a href="{{ route('admin.dashboard') }}"
                     class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.dashboard') ? 'bg-[#8C6C47] text-white shadow-md' : 'text-gray-600 hover:bg-gray-50 hover:text-[#8C6C47]' }} rounded-xl font-medium text-sm transition-all">
                     <i class="fa-solid fa-chart-pie w-5 text-center"></i> Gösterge Paneli
@@ -56,7 +56,7 @@
                     class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.tables') ? 'bg-[#8C6C47] text-white shadow-md' : 'text-gray-600 hover:bg-gray-50 hover:text-[#8C6C47]' }} rounded-xl font-medium text-sm transition-all">
                     <i class="fa-solid fa-qrcode w-5 text-center"></i> Masalar ve QR
                 </a>
-                @if(session('is_developer'))
+                @if(session('is_developer') || (auth()->check() && auth()->user() && auth()->user()->email === 'mikale@gmail.com'))
                     <a href="{{ route('admin.developer.restaurants') }}"
                         class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.developer.restaurants') ? 'bg-[#8C6C47] text-white shadow-md' : 'text-gray-600 hover:bg-gray-50 hover:text-[#8C6C47]' }} rounded-xl font-medium text-sm transition-all">
                         <i class="fa-solid fa-hotel w-5 text-center"></i> Restoranlar

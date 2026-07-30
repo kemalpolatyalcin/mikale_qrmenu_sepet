@@ -36,7 +36,11 @@
                 class="text-gray-800 text-2xl focus:outline-none">
                 <i class="fa-solid fa-bars"></i>
             </button>
-            <div class="font-allison text-3xl text-black leading-none">M</div>
+            @if(isset($activeRestaurant) && $activeRestaurant->logo_url)
+                <img src="{{ asset($activeRestaurant->logo_url) }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white" alt="Restaurant Logo">
+            @else
+                <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white mix-blend-multiply" alt="Restaurant Logo">
+            @endif
         </header>
 
         <header
@@ -45,7 +49,7 @@
             <div class="flex items-center gap-4">
                 <div
                     class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-bold border-2 border-[#8C6C47]">
-                    {{ substr(optional(Auth::user())->full_name ?? optional(Auth::user())->name ?? 'A', 0, 1) }}
+                    {{ mb_substr(optional(Auth::user())->full_name ?? optional(Auth::user())->name ?? 'A', 0, 1, 'UTF-8') }}
                 </div>
             </div>
         </header>

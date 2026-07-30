@@ -46,7 +46,11 @@
             <button id="mobileMenuBtn" onclick="document.getElementById('mobile-admin-menu').classList.remove('-translate-x-full')" class="text-gray-800 p-2 hover:bg-gray-50 rounded-lg transition-colors">
                 <i class="fa-solid fa-bars text-xl"></i>
             </button>
-            <div class="font-allison text-4xl text-black pt-1 sidebar-restaurant-letter">{{ isset($activeRestaurant) ? substr($activeRestaurant->name, 0, 1) : (substr($siteSettings['restaurant_name'] ?? 'M', 0, 1)) }}</div>
+            @if(isset($activeRestaurant) && $activeRestaurant->logo_url)
+                <img src="{{ asset($activeRestaurant->logo_url) }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white" alt="Restaurant Logo">
+            @else
+                <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white mix-blend-multiply" alt="Restaurant Logo">
+            @endif
         </header>
 
         <header
@@ -55,23 +59,20 @@
                 <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Yönetim Paneli</span>
             </div>
 
-            @if(!request()->routeIs('admin.settings') && !request()->routeIs('admin.tables'))
             <div class="flex items-center gap-3">
+                @if(!request()->routeIs('admin.settings') && !request()->routeIs('admin.tables'))
                 <a href="{{ url('/') }}" target="_blank"
                     class="bg-amber-50 hover:bg-amber-100 text-[#8C6C47] font-semibold text-xs px-4 py-2.5 rounded-xl border border-amber-100 transition-colors flex items-center gap-2">
                     <i class="fa-solid fa-eye text-xs"></i>
                     <span>Menüyü Görüntüle</span>
                 </a>
-                <form action="{{ route('logout') }}" method="POST" class="inline">
-                    @csrf
-                    <button type="submit"
-                        class="w-10 h-10 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl border border-red-100 transition-colors flex items-center justify-center"
-                        title="Çıkış Yap">
-                        <i class="fa-solid fa-right-from-bracket text-sm"></i>
-                    </button>
-                </form>
+                @endif
+                @if(isset($activeRestaurant) && $activeRestaurant->logo_url)
+                    <img src="{{ asset($activeRestaurant->logo_url) }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white" alt="Restaurant Logo">
+                @else
+                    <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white mix-blend-multiply" alt="Restaurant Logo">
+                @endif
             </div>
-            @endif
         </header>
 
         <main class="flex-1 w-full overflow-y-auto p-4 md:p-8 no-scrollbar relative">

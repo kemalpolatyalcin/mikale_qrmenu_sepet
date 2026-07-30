@@ -1,30 +1,34 @@
 <aside class="w-64 bg-white shadow-xl hidden md:flex flex-col justify-between z-20 shrink-0">
     <div>
-        <div class="h-24 flex items-center justify-center border-b border-gray-100 mb-6">
-            <span class="font-allison text-6xl text-[#1C1C1C] mt-4 sidebar-restaurant-letter">{{ isset($activeRestaurant) ? substr($activeRestaurant->name, 0, 1) : (substr($siteSettings['restaurant_name'] ?? 'M', 0, 1)) }}</span>
-            <span class="text-xl font-bold ml-2 tracking-widest text-[#1C1C1C] sidebar-restaurant-name">{{ isset($activeRestaurant) ? $activeRestaurant->name : ($siteSettings['restaurant_name'] ?? 'MIKALE') }}</span>
+        <div class="h-24 flex items-center justify-center border-b border-gray-100 mb-6 px-4">
+            @if(isset($activeRestaurant) && $activeRestaurant->logo_url)
+                <img src="{{ asset($activeRestaurant->logo_url) }}" class="h-12 object-contain" alt="Logo">
+            @else
+                <span class="text-lg font-bold tracking-widest text-[#1C1C1C] sidebar-restaurant-name">{{ isset($activeRestaurant) ? $activeRestaurant->name : ($siteSettings['restaurant_name'] ?? 'MIKALE') }}</span>
+            @endif
         </div>
-        @if(session('is_developer') && isset($restaurantsList) && $restaurantsList->count() > 0)
-        <div class="px-4 mb-4">
-            <form action="{{ route('admin.restaurants.select') }}" method="POST" id="restaurant-select-form">
-                @csrf
-                <label class="text-[10px] uppercase font-bold text-gray-400 tracking-wider block mb-1">Aktif Restoran</label>
-                <select name="restaurant_id" onchange="document.getElementById('restaurant-select-form').submit()" 
-                    class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold text-gray-700 focus:outline-none focus:border-[#8C6C47] transition-all">
-                    @foreach($restaurantsList as $res)
-                        <option value="{{ $res->id }}" {{ isset($activeRestaurant) && $activeRestaurant->id == $res->id ? 'selected' : '' }}>
-                            {{ $res->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </form>
-        </div>
-        @endif
         <nav class="px-4 space-y-2">
+            @if((session('is_developer') || (auth()->check() && auth()->user() && auth()->user()->email === 'mikale@gmail.com')) && isset($restaurantsList) && $restaurantsList->count() > 0)
+            <div class="mb-4">
+                <label class="text-[10px] uppercase font-bold text-gray-400 tracking-wider block mb-1.5 px-2">Restoranlar</label>
+                <div class="space-y-1 max-h-32 overflow-y-auto border border-gray-100 rounded-xl p-1.5 bg-gray-50/50">
+                    @foreach($restaurantsList as $res)
+                        <form action="{{ route('admin.restaurants.select') }}" method="POST" class="m-0">
+                            @csrf
+                            <input type="hidden" name="restaurant_id" value="{{ $res->id }}">
+                            <button type="submit" class="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold transition-all {{ (isset($activeRestaurant) && $activeRestaurant->id == $res->id) ? 'bg-[#8C6C47] text-white shadow-sm font-bold' : 'text-gray-600 hover:bg-gray-100' }}">
+                                {{ $res->name }}
+                            </button>
+                        </form>
+                    @endforeach
+                </div>
+            </div>
+            @endif
             <a href="{{ url('/') }}" target="_blank"
                 class="flex items-center gap-3 px-4 py-3 text-[#8C6C47] bg-amber-50 rounded-xl mb-4 border border-amber-100">
                 <i class="fa-solid fa-arrow-up-right-from-square w-5 text-center"></i> <span>Menüyü Gör</span>
             </a>
+
             <a href="{{ route('admin.dashboard') }}"
                 class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.dashboard') ? 'bg-[#8C6C47] text-white' : 'text-gray-600 hover:bg-gray-50' }} rounded-xl transition-all">
                 <i class="fa-solid fa-chart-pie w-5 text-center"></i> <span>Gösterge Paneli</span>
@@ -49,7 +53,7 @@
                 class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.tables') ? 'bg-[#8C6C47] text-white' : 'text-gray-600 hover:bg-gray-50' }} rounded-xl transition-all">
                 <i class="fa-solid fa-qrcode w-5 text-center"></i> <span>Masalar ve QR</span>
             </a>
-            @if(session('is_developer'))
+            @if(session('is_developer') || (auth()->check() && auth()->user() && auth()->user()->email === 'mikale@gmail.com'))
                 <a href="{{ route('admin.developer.restaurants') }}"
                     class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.developer.restaurants') ? 'bg-[#8C6C47] text-white shadow-md' : 'text-gray-600 hover:bg-gray-50 hover:text-[#8C6C47]' }} rounded-xl font-medium text-sm transition-all">
                     <i class="fa-solid fa-hotel w-5 text-center"></i> <span>Restoranlar</span>
@@ -111,6 +115,7 @@
                         });
                     } catch (err) {}
                     localStorage.removeItem('admin_token');
+                    document.cookie = "admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
                     form.submit();
                 }
             }

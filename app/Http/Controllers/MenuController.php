@@ -21,8 +21,12 @@ class MenuController extends Controller
             }
         }
         if (!$restaurantId) {
-            $first = Restaurant::first();
-            $restaurantId = $first ? $first->id : null;
+            if (session()->has('active_restaurant_id')) {
+                $restaurantId = session('active_restaurant_id');
+            } else {
+                $first = Restaurant::first();
+                $restaurantId = $first ? $first->id : null;
+            }
         }
 
         $categories = Category::where('restaurant_id', $restaurantId)->orderBy('id', 'asc')->get();
@@ -43,8 +47,12 @@ class MenuController extends Controller
             }
         }
         if (!$restaurantId) {
-            $first = Restaurant::first();
-            $restaurantId = $first ? $first->id : null;
+            if (session()->has('active_restaurant_id')) {
+                $restaurantId = session('active_restaurant_id');
+            } else {
+                $first = Restaurant::first();
+                $restaurantId = $first ? $first->id : null;
+            }
         }
 
         $products = Product::where('restaurant_id', $restaurantId)->get();

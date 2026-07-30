@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'api.bearer' => \App\Http\Middleware\ApiBearerTokenAuth::class,
+            'developer.restaurant' => \App\Http\Middleware\DeveloperActiveRestaurant::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

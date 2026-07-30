@@ -111,6 +111,7 @@ Route::get('/api/products', [MenuController::class, 'getProducts']);
 Route::get('/api/tables/{token}', [MenuController::class, 'getTable']);
 
 Route::post('/api/orders/place', [OrderController::class, 'placeOrder']);
+Route::post('/api/waiter/call', [OrderController::class, 'callWaiter']);
 
 Route::middleware('api.bearer')->prefix('api')->group(function () {
     Route::get('/sync/status', [\App\Http\Controllers\Api\SyncController::class, 'getStatus']);

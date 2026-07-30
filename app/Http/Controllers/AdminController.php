@@ -538,7 +538,7 @@ class AdminController extends Controller
     public function checkNewOrders(Request $request)
     {
         $restaurantId = $this->getActiveRestaurantId();
-        $latestOrder = \App\Models\Order::where('restaurant_id', $restaurantId)->latest('id')->first();
+        $latestOrder = \App\Models\Order::with('items')->where('restaurant_id', $restaurantId)->latest('id')->first();
         $hasNew = false;
         if ($latestOrder) {
             if (!session()->has('last_checked_order_id')) {
@@ -551,7 +551,12 @@ class AdminController extends Controller
                 }
             }
         }
-        return response()->json(['has_new' => $hasNew]);
+        $data = ['has_new' => $hasNew];
+        if ($hasNew && $latestOrder) {
+            $data['table_number'] = $latestOrder->table_number;
+            $data['description'] = $latestOrder->items->map(fn($item) => $item->quantity . 'x ' . $item->product_name)->join(', ');
+        }
+        return response()->json($data);
     }
 
     public function register(Request $request)

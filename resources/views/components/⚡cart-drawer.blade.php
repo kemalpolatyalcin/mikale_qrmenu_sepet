@@ -22,14 +22,21 @@ new class extends Component {
     {
     }
 
+    public function mount()
+    {
+        if (!$this->tableNumber || $this->tableNumber === 'Bilinmeyen Masa') {
+            $this->tableNumber = request()->query('masa') ?? request()->query('table') ?? 'Bilinmeyen Masa';
+        }
+    }
+
     #[On('add-to-cart')]
-    public function addToCart($id, $name, $price)
+    public function addToCart($id, $name, $price, $quantity = 1)
     {
         Cart::add([
             'id' => $id,
             'name' => $name,
             'price' => $price,
-            'quantity' => 1,
+            'quantity' => $quantity,
             'attributes' => []
         ]);
         $this->dispatch('cart-updated', count: Cart::getContent()->sum('quantity'));

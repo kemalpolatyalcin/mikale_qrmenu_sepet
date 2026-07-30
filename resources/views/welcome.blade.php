@@ -400,6 +400,17 @@
             </footer>
         </main>
 
+        <button onclick="window.dispatchEvent(new CustomEvent('open-cart'))" class="fixed bottom-24 right-6 md:bottom-8 md:right-8 bg-brand-gold/90 hover:bg-brand-gold backdrop-blur text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center z-[50] transition-all hover:scale-110 duration-300">
+            <i class="fa-solid fa-basket-shopping text-xl"></i>
+            <span id="floating-cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-[10px] font-extrabold w-5 h-5 flex items-center justify-center border-2 border-white {{ \Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') == 0 ? 'hidden' : '' }}">
+                {{ \Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') }}
+            </span>
+        </button>
+
+        <button onclick="callWaiter()" class="fixed bottom-24 left-6 md:bottom-8 md:left-8 bg-brand-gold/90 hover:bg-brand-gold backdrop-blur text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center z-[50] transition-all hover:scale-110 duration-300">
+            <i class="fa-solid fa-bell-concierge text-xl"></i>
+        </button>
+
         <nav
             class="fixed md:hidden bottom-0 left-0 right-0 w-full bg-white rounded-t-3xl shadow-[0_-5px_15px_rgba(0,0,0,0.05)] px-4 py-4 pb-6 flex justify-between items-center text-[10px] sm:text-xs font-medium text-gray-500 z-50">
             <button onclick="switchView('home')"
@@ -450,9 +461,23 @@
                     <p id="modal-desc" class="text-sm text-gray-700 leading-relaxed mb-6">Detaylar yükleniyor...</p>
                 </div>
 
+                <div class="p-6 bg-white border-t border-gray-100 flex items-center justify-between gap-4 shrink-0">
+                    <div class="flex items-center bg-gray-50 border border-gray-200 rounded-xl">
+                        <button id="modal-qty-minus" onclick="adjustModalQty(-1)" class="px-4 py-2.5 text-gray-500 hover:text-brand-text font-bold transition-colors">-</button>
+                        <span id="modal-qty-display" class="px-2 font-semibold text-sm w-8 text-center">1</span>
+                        <button id="modal-qty-plus" onclick="adjustModalQty(1)" class="px-4 py-2.5 text-gray-500 hover:text-brand-text font-bold transition-colors">+</button>
+                    </div>
+                    <button id="modal-add-to-cart-btn" onclick="addModalItemToCart()" class="flex-1 py-3 bg-brand-gold hover:bg-[#735738] text-white rounded-xl font-bold transition-colors shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-basket-shopping"></i>
+                        <span>Sepete Ekle</span>
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>
+
+    <livewire:cart-drawer />
 
     @livewireScripts
 
@@ -463,12 +488,16 @@
             tr: {
                 heroDesc: "Gelenekten ilham alan lezzetleri modern bir dokunuşla sunuyor, her ziyareti özel bir anıya dönüştürüyoruz",
                 search: "Arama....", tableLabel: "Masa:", loadingCats: "Kategoriler yükleniyor...",
-                navHome: "Ana Sayfa", navSearch: "Menü", navSearchBtn: "Menü", searchResults: "Arama Sonuçları"
+                navHome: "Ana Sayfa", navSearch: "Menü", navSearchBtn: "Menü", searchResults: "Arama Sonuçları",
+                navWaiter: "Garson Çağır",
+                waiterCalledSuccess: "Garson çağırma talebi iletildi."
             },
             en: {
                 heroDesc: "Offering tradition-inspired flavors with a modern touch, turning every visit into a special memory",
                 search: "Search....", tableLabel: "Table:", loadingCats: "Loading categories...",
-                navHome: "Home", navSearch: "Menu", navSearchBtn: "Menu", searchResults: "Search Results"
+                navHome: "Home", navSearch: "Menu", navSearchBtn: "Menu", searchResults: "Search Results",
+                navWaiter: "Call Waiter",
+                waiterCalledSuccess: "Waiter call request sent."
             }
         };
 
@@ -816,6 +845,9 @@
                             </div>
                             <div class="flex justify-between items-center mt-3 pt-2">
                                 <span class="font-extrabold text-gray-900 text-sm">${currencySymbol}${product.price}</span>
+                                <button onclick="event.stopPropagation(); quickAddToCart(${product.id})" class="w-8 h-8 rounded-full bg-brand-gold hover:bg-[#735738] text-white flex items-center justify-center shadow-sm transition-transform hover:scale-110">
+                                    <i class="fa-solid fa-plus text-xs"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -849,9 +881,14 @@
                             <p class="text-xs text-gray-500 line-clamp-2 mt-1 leading-snug">${product.description || ''}</p>
                             <div class="flex justify-between items-end mt-3">
                                 <span class="font-extrabold text-gray-900 text-base">₺${product.price}</span>
-                                <div class="flex items-center gap-2 text-[10px] text-gray-500 font-semibold">
-                                    <span><i class="fa-solid fa-fire text-orange-400 mr-1"></i> ${kcalText}</span>
-                                    <span><i class="fa-regular fa-clock mr-1 text-gray-400"></i> ${timeText}</span>
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-2 text-[10px] text-gray-500 font-semibold">
+                                        <span><i class="fa-solid fa-fire text-orange-400 mr-1"></i> ${kcalText}</span>
+                                        <span><i class="fa-regular fa-clock mr-1 text-gray-400"></i> ${timeText}</span>
+                                    </div>
+                                    <button onclick="event.stopPropagation(); quickAddToCart(${product.id})" class="w-8 h-8 rounded-full bg-brand-gold hover:bg-[#735738] text-white flex items-center justify-center shadow-sm transition-transform hover:scale-110">
+                                        <i class="fa-solid fa-plus text-xs"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -887,9 +924,16 @@
             });
         }
 
+        let currentModalProductId = null;
+        let currentModalProductQty = 1;
+
         function openProductModal(productId) {
             const product = allProducts.find(p => p.id == productId);
             if (!product) return;
+
+            currentModalProductId = productId;
+            currentModalProductQty = 1;
+            document.getElementById('modal-qty-display').innerText = currentModalProductQty;
 
             document.getElementById('modal-image').src = getImageUrl(product.image_url);
             document.getElementById('modal-title').innerText = product.name;
@@ -919,6 +963,85 @@
             document.getElementById('overlay').classList.remove('open');
             document.getElementById('product-modal').classList.remove('open');
             document.body.style.overflow = '';
+        }
+
+        function adjustModalQty(amount) {
+            currentModalProductQty = Math.max(1, currentModalProductQty + amount);
+            document.getElementById('modal-qty-display').innerText = currentModalProductQty;
+        }
+
+        function addModalItemToCart() {
+            const product = allProducts.find(p => p.id == currentModalProductId);
+            if (!product) return;
+            Livewire.dispatch('add-to-cart', {
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                quantity: currentModalProductQty
+            });
+            closeProductModal();
+        }
+
+        function quickAddToCart(productId) {
+            const product = allProducts.find(p => p.id == productId);
+            if (!product) return;
+            Livewire.dispatch('add-to-cart', {
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                quantity: 1
+            });
+        }
+
+        window.addEventListener('cart-updated', event => {
+            const count = event.detail.count !== undefined ? event.detail.count : (event.detail[0] && event.detail[0].count !== undefined ? event.detail[0].count : 0);
+            
+            const badge = document.getElementById('floating-cart-count');
+            if (badge) {
+                badge.innerText = count;
+                if (count > 0) {
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+
+            const navBadge = document.getElementById('nav-cart-count');
+            if (navBadge) {
+                navBadge.innerText = count;
+                if (count > 0) {
+                    navBadge.classList.remove('hidden');
+                } else {
+                    navBadge.classList.add('hidden');
+                }
+            }
+
+        });
+
+        function callWaiter() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let tableToken = urlParams.get('masa') || urlParams.get('table') || 'Bilinmeyen Masa';
+            
+            fetch('/api/waiter/call', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ table_token: tableToken })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.status === 'success') {
+                    alert(translations[currentLang].waiterCalledSuccess || 'Garson çağırma talebi iletildi.');
+                } else {
+                    alert('Bir hata oluştu.');
+                }
+            })
+            .catch(() => {
+                alert('Bir hata oluştu.');
+            });
         }
     </script>
 </body>

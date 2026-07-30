@@ -14,6 +14,8 @@ new class extends Component {
     public $selectedPaymentMethod = 'Nakit';
     public $lastOrderCount = 0;
     public $hasNewOrder = false;
+    public $newOrderTableNumber = null;
+    public $newOrderDescription = null;
 
     public function selectTable($name)
     {
@@ -152,6 +154,16 @@ new class extends Component {
         $currentCount = Order::where('restaurant_id', $restaurantId)->count();
         if ($this->lastOrderCount > 0 && $currentCount > $this->lastOrderCount) {
             $this->hasNewOrder = true;
+            $latest = Order::with('items')->where('restaurant_id', $restaurantId)->latest('id')->first();
+            if ($latest) {
+                $this->newOrderTableNumber = $latest->table_number;
+                $this->newOrderDescription = $latest->items->map(fn($item) => $item->quantity . 'x ' . $item->product_name)->join(', ');
+                $this->dispatch('new-order-received');
+            } else {
+                $this->newOrderTableNumber = null;
+                $this->newOrderDescription = null;
+                $this->dispatch('new-order-received');
+            }
         }
         $this->lastOrderCount = $currentCount;
 
@@ -199,7 +211,7 @@ new class extends Component {
 };
 ?>
 
-<div wire:poll.5s class="min-h-screen bg-brand-bg text-gray-800 font-sans p-6">
+<div wire:poll.2s class="min-h-screen bg-brand-bg text-gray-800 font-sans p-6">
     <div class="max-w-[1600px] mx-auto space-y-6">
         
         <header class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -237,13 +249,55 @@ new class extends Component {
         </header>
 
         @if($hasNewOrder)
-            <div class="bg-amber-500/15 border border-amber-500/40 text-amber-800 px-5 py-4 rounded-2xl shadow-lg flex justify-between items-center animate-bounce">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-bell text-xl text-amber-600"></i>
-                    <span class="font-bold text-sm">Yeni sipariş geldi! Masa durumları güncellendi.</span>
+            <style>
+                @keyframes slideInRight {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+                @keyframes swing {
+                    0%, 100% { transform: rotate(0deg); }
+                    20% { transform: rotate(15deg); }
+                    40% { transform: rotate(-10deg); }
+                    60% { transform: rotate(5deg); }
+                    80% { transform: rotate(-5deg); }
+                }
+                .animate-slide-in-right {
+                    animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                }
+                .animate-swing {
+                    animation: swing 1s ease-in-out infinite;
+                }
+            </style>
+            <div class="fixed top-6 right-6 z-[100] max-w-sm w-full bg-white border-l-4 border-amber-500 shadow-2xl rounded-2xl p-4 flex justify-between items-start gap-4 transition-all duration-300 animate-slide-in-right">
+                <div class="flex gap-3">
+                    <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 shrink-0">
+                        <i class="fa-solid fa-bell text-lg animate-swing"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 text-sm">
+                            @if($newOrderTableNumber)
+                                Masa {{ $newOrderTableNumber }} - Yeni Sipariş!
+                            @else
+                                Yeni Sipariş Alındı!
+                            @endif
+                        </h4>
+                        <p class="text-xs text-gray-500 mt-1">
+                            @if($newOrderDescription)
+                                {{ $newOrderDescription }}
+                            @else
+                                Masa durumları ve sipariş listesi güncellendi.
+                            @endif
+                        </p>
+                    </div>
                 </div>
-                <button wire:click="dismissNewAlert" class="text-amber-700 hover:text-white transition-colors text-sm font-bold bg-amber-500/20 px-3 py-1 rounded-lg border border-amber-500/30">
-                    Anladım
+                <button wire:click="dismissNewAlert" class="text-gray-400 hover:text-gray-600 transition-colors text-sm font-bold bg-gray-50 hover:bg-gray-100 p-1.5 rounded-lg border border-gray-200">
+                    <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
         @endif
@@ -428,5 +482,41 @@ new class extends Component {
             btn.disabled = false;
             alert('Masaüstü bağlantısı yenilenirken bir hata oluştu.');
         });
+    }
+
+    window.addEventListener('new-order-received', () => {
+        playNotificationChime();
+    });
+
+    function playNotificationChime() {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc1 = audioCtx.createOscillator();
+            const osc2 = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+            osc1.frequency.exponentialRampToValueAtTime(659.25, audioCtx.currentTime + 0.15);
+            osc1.frequency.exponentialRampToValueAtTime(783.99, audioCtx.currentTime + 0.3);
+            
+            osc2.type = 'triangle';
+            osc2.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+            osc2.frequency.exponentialRampToValueAtTime(783.99, audioCtx.currentTime + 0.3);
+            
+            gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            
+            osc1.connect(gainNode);
+            osc2.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc1.start();
+            osc2.start();
+            osc1.stop(audioCtx.currentTime + 0.4);
+            osc2.stop(audioCtx.currentTime + 0.4);
+        } catch (e) {
+            console.error(e);
+        }
     }
 </script>

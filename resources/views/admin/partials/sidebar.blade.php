@@ -120,5 +120,107 @@
                 }
             }
         });
+
+        if (window.location.pathname.indexOf('/admin/orders') === -1) {
+            function playAdminChime() {
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc1 = audioCtx.createOscillator();
+                    const osc2 = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    
+                    osc1.type = 'sine';
+                    osc1.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                    osc1.frequency.exponentialRampToValueAtTime(659.25, audioCtx.currentTime + 0.15);
+                    osc1.frequency.exponentialRampToValueAtTime(783.99, audioCtx.currentTime + 0.3);
+                    
+                    osc2.type = 'triangle';
+                    osc2.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                    osc2.frequency.exponentialRampToValueAtTime(783.99, audioCtx.currentTime + 0.3);
+                    
+                    gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                    
+                    osc1.connect(gainNode);
+                    osc2.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    
+                    osc1.start();
+                    osc2.start();
+                    osc1.stop(audioCtx.currentTime + 0.4);
+                    osc2.stop(audioCtx.currentTime + 0.4);
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            function showAdminOrderNotification(tableNumber, description) {
+                playAdminChime();
+                
+                let container = document.getElementById('admin-notification-container');
+                if (!container) {
+                    container = document.createElement('div');
+                    container.id = 'admin-notification-container';
+                    container.className = 'fixed top-6 right-6 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-none';
+                    document.body.appendChild(container);
+                }
+                
+                const notification = document.createElement('div');
+                notification.className = 'pointer-events-auto bg-white border-l-4 border-amber-500 shadow-2xl rounded-2xl p-4 flex justify-between items-start gap-4 transition-all duration-300 transform translate-x-full opacity-0 cursor-pointer hover:bg-gray-50/80';
+                
+                const titleText = tableNumber ? `Masa ${tableNumber} - Yeni Sipariş!` : 'Yeni Sipariş Alındı!';
+                const bodyText = description ? description : 'Sipariş detayları güncellendi. Kontrol etmek için tıklayın.';
+                
+                notification.innerHTML = `
+                    <div class="flex gap-3">
+                        <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 shrink-0">
+                            <i class="fa-solid fa-bell text-lg"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-sm">${titleText}</h4>
+                            <p class="text-xs text-gray-500 mt-1">${bodyText}</p>
+                        </div>
+                    </div>
+                    <button class="text-gray-400 hover:text-gray-600 transition-colors text-sm font-bold bg-gray-50 hover:bg-gray-100 p-1.5 rounded-lg border border-gray-200">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                `;
+                
+                container.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.classList.remove('translate-x-full', 'opacity-0');
+                }, 50);
+                
+                notification.addEventListener('click', () => {
+                    window.location.href = '/admin/orders';
+                });
+                
+                const closeBtn = notification.querySelector('button');
+                closeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    notification.classList.add('translate-x-full', 'opacity-0');
+                    setTimeout(() => notification.remove(), 300);
+                });
+                
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.classList.add('translate-x-full', 'opacity-0');
+                        setTimeout(() => notification.remove(), 300);
+                    }
+                }, 6000);
+            }
+
+            setInterval(() => {
+                fetch('/admin/api/new-orders-check')
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.has_new) {
+                            showAdminOrderNotification(data.table_number, data.description);
+                        }
+                    })
+                    .catch(() => {});
+            }, 3000);
+        }
     })();
 </script>

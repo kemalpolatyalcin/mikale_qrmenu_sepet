@@ -64,4 +64,43 @@ class OrderController
             'data' => $order->load('items')
         ]);
     }
+
+    public function callWaiter(Request $request)
+    {
+        $tableNumber = $request->input('table_token') ?? $request->input('table_number') ?? $request->input('table_name') ?? 'Bilinmiyor';
+        $table = \App\Models\Table::where('token', $tableNumber)->first();
+        $restaurantId = null;
+        if ($table) {
+            $tableNumber = $table->name;
+            $restaurantId = $table->restaurant_id;
+        }
+        if (!$restaurantId) {
+            $default = \App\Models\Restaurant::first();
+            $restaurantId = $default ? $default->id : null;
+        }
+
+        $order = Order::create([
+            'table_number' => $tableNumber,
+            'total_amount' => 0,
+            'cutlery_requested' => false,
+            'payment_method' => 'cash',
+            'coupon_code' => null,
+            'order_note' => 'Garson Çağırıldı',
+            'status' => 'pending',
+            'restaurant_id' => $restaurantId
+        ]);
+
+        OrderItem::create([
+            'order_id' => $order->id,
+            'product_id' => 0,
+            'product_name' => 'Garson Çağırıldı',
+            'price' => 0,
+            'quantity' => 1
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Garson çağırma talebiniz iletildi.'
+        ]);
+    }
 }

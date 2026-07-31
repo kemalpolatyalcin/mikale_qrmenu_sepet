@@ -272,11 +272,65 @@
                         {!! $siteSettings['slogan'] ?? 'Harika Tatlar,<br>Güzel Anılar...' !!}
                     </h1>
 
-                    <p data-i18n="heroDesc"
-                        class="text-[18px] md:text-[21px] font-poppins font-normal text-brand-text mb-6 md:mb-10 leading-snug max-w-2xl px-4">
-                        Gelenekten ilham alan lezzetleri modern bir dokunuşla sunuyor, her ziyareti özel bir anıya
-                        dönüştürüyoruz
-                    </p>
+                    <div class="w-full max-w-sm bg-white border border-gray-100 rounded-3xl p-5 shadow-sm flex flex-col gap-4 text-left font-poppins text-xs text-gray-600 mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+                                <i class="fa-regular fa-clock text-base"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Çalışma Saatleri</p>
+                                <p class="text-gray-800 font-medium mt-0.5">{{ $siteSettings['working_hours'] ?? '09:00 - 02:00' }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+                                <i class="fa-solid fa-location-dot text-base"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Adres</p>
+                                <p class="text-gray-800 font-medium mt-0.5 leading-relaxed">{{ $siteSettings['address'] ?? 'Hacı Yusuf, Kaşif Acar Cd. No: 2/A, 10200 Bandırma/Balıkesir' }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+                                <i class="fa-solid fa-phone text-base"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Telefon</p>
+                                <a href="tel:{{ $siteSettings['phone'] ?? '05334084611' }}" class="text-[#8C6C47] hover:underline font-semibold mt-0.5 block">{{ $siteSettings['phone'] ?? '05334084611' }}</a>
+                            </div>
+                        </div>
+                        @php
+                            $waPhone = $siteSettings['whatsapp_phone'] ?? '05334084611';
+                            $waClean = preg_replace('/[^0-9]/', '', $waPhone);
+                            if (str_starts_with($waClean, '0')) {
+                                $waClean = '90' . substr($waClean, 1);
+                            }
+                        @endphp
+                        <div class="flex items-center justify-between border-t border-gray-100 pt-3 mt-1">
+                            <a href="{{ $siteSettings['instagram_url'] ?? 'https://www.instagram.com/oztaylansutevi?igsh=amt1cW1qaW43Zm1k' }}" target="_blank"
+                                class="flex items-center gap-2 text-xs text-pink-600 hover:underline font-semibold">
+                                <i class="fa-brands fa-instagram text-base"></i> <span>Instagram</span>
+                            </a>
+                            <a href="https://wa.me/{{ $waClean }}" target="_blank"
+                                class="flex items-center gap-2 text-xs text-emerald-600 hover:underline font-semibold">
+                                <i class="fa-brands fa-whatsapp text-base"></i> <span>WhatsApp</span>
+                            </a>
+                        </div>
+                    </div>
+                    <a href="https://www.google.com/search?client=firefox-b-d&hs=rIMq&sa=X&sca_esv=3e69f37c1e17d2ac&sxsrf=APpeQntEY5wgTD9sHwOeaN0Jq8LXoxnKLA:1785492779306&q=%C3%96ztaylan+S%C3%BCtevi+Yorumlar&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxI2tLQ0MTM2sLAwMjQ3MjAHwQ2MjK8YpQ5PqypJrMxJzFMIPrynJLUsUyEyv6g0NyexaBErHkkA07rjC1QAAAA&rldimm=1994630882172070707&tbm=lcl&hl=tr-TR&ved=2ahUKEwiV3u_21vyVAxXc1gIHHaC3MwkQ9fQKegQIORAG&biw=630&bih=1056&dpr=0.88#lkt=LocalPoiReviews" target="_blank"
+                        class="w-full max-w-sm bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-2xl p-4 shadow-md flex items-center justify-between gap-3 mb-6 transition-all duration-300 transform hover:scale-[1.02] cursor-pointer font-poppins">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-star text-white text-lg"></i>
+                            </div>
+                            <div class="text-left">
+                                <h4 class="font-bold text-sm tracking-wide">Yorum Bırakın</h4>
+                                <p class="text-[10px] text-white/80">Deneyiminizi Google'da paylaşarak bize destek olun.</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-white/80 text-sm"></i>
+                    </a>
                     <div class="relative w-full max-w-sm flex items-center bg-white border border-gray-300 rounded-full shadow-sm p-1 cursor-pointer"
                         onclick="switchView('search'); setTimeout(() => document.getElementById('searchInput').focus(), 100);">
                         <i

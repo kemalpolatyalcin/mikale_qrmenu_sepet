@@ -66,6 +66,10 @@
                     class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.settings') ? 'bg-[#8C6C47] text-white shadow-md mt-4' : 'text-gray-600 hover:bg-gray-50 hover:text-[#8C6C47] mt-4' }} rounded-xl font-medium text-sm transition-all">
                     <i class="fa-solid fa-gear w-5 text-center"></i> Ayarlar
                 </a>
+                <a href="https://www.google.com/search?client=firefox-b-d&hs=rIMq&sa=X&sca_esv=3e69f37c1e17d2ac&sxsrf=APpeQntEY5wgTD9sHwOeaN0Jq8LXoxnKLA:1785492779306&q=%C3%96ztaylan+S%C3%BCtevi+Yorumlar&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxI2tLQ0MTM2sLAwMjQ3MjAHwQ2MjK8YpQ5PqypJrMxJzFMIPrynJLUsUyEyv6g0NyexaBErHkkA07rjC1QAAAA&rldimm=1994630882172070707&tbm=lcl&hl=tr-TR&ved=2ahUKEwiV3u_21vyVAxXc1gIHHaC3MwkQ9fQKegQIORAG&biw=630&bih=1056&dpr=0.88#lkt=LocalPoiReviews" target="_blank"
+                    class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-[#8C6C47] rounded-xl font-medium text-sm transition-all mt-3">
+                    <i class="fa-solid fa-star w-5 text-center text-amber-500"></i> Google Yorumları
+                </a>
             </nav>
         </div>
 

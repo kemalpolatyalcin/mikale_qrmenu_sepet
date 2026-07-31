@@ -103,6 +103,20 @@
                             class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8C6C47] transition-all">
                     </div>
 
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Instagram Bağlantısı</label>
+                        <input type="text" name="instagram_url" value="{{ $settings['instagram_url'] ?? '' }}"
+                            placeholder="Örn: https://instagram.com/kullaniciadi"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8C6C47] transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">WhatsApp Numarası</label>
+                        <input type="text" name="whatsapp_phone" value="{{ $settings['whatsapp_phone'] ?? '' }}"
+                            placeholder="Örn: 05334084611"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8C6C47] transition-all">
+                    </div>
+
                     <div class="col-span-1 md:col-span-2">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Açık Adres</label>
                         <textarea name="address" rows="2"

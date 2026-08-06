@@ -99,6 +99,13 @@ class AdminController extends Controller
         }
 
         $category->save();
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Kategori başarıyla eklendi!',
+                'category' => $category
+            ]);
+        }
         return redirect()->back()->with('success', 'Kategori başarıyla eklendi!');
     }
 
@@ -143,6 +150,13 @@ class AdminController extends Controller
         }
 
         $category->save();
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Kategori başarıyla güncellendi!',
+                'category' => $category
+            ]);
+        }
         return redirect()->back()->with('success', 'Kategori başarıyla güncellendi!');
     }
 
@@ -168,6 +182,12 @@ class AdminController extends Controller
             File::delete(public_path($category->image_url));
         }
         $category->delete();
+        if (request()->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Kategori silindi!'
+            ]);
+        }
         return redirect()->back()->with('success', 'Kategori silindi!');
     }
 

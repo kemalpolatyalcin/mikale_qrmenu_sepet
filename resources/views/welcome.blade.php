@@ -206,8 +206,8 @@
                 preserveAspectRatio="none" fill="currentColor">
                 <path d="M0,60 C400,160 1000,-40 1440,60 L1440,85 C1000,-15 400,185 0,85 Z"></path>
             </svg>
-            <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="relative z-10 anim-logo h-40 object-contain mix-blend-multiply"
-                alt="Logo">
+            <img src="{{ asset('images/oztaylan_logo.jpg') }}"
+                class="relative z-10 anim-logo h-40 object-contain mix-blend-multiply" alt="Logo">
             <svg class="absolute bottom-[30%] left-0 w-full h-16 anim-stripe-bottom text-brand-gold"
                 viewBox="0 0 1440 150" preserveAspectRatio="none" fill="currentColor">
                 <path d="M0,60 C400,160 1000,-40 1440,60 L1440,85 C1000,-15 400,185 0,85 Z"></path>
@@ -217,7 +217,8 @@
         <header id="main-header"
             class="hidden justify-between items-center px-6 pt-12 md:pt-6 pb-4 bg-brand-bg border-b border-gray-100">
             <div class="cursor-pointer flex items-center gap-2" onclick="switchView('home')">
-                <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-14 object-contain mix-blend-multiply" alt="Logo">
+                <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-14 object-contain mix-blend-multiply"
+                    alt="Logo">
             </div>
 
             <nav class="hidden md:flex items-center gap-8 font-medium text-sm text-gray-500">
@@ -242,7 +243,8 @@
                 <div class="relative w-full h-[340px] md:h-[60vh] rounded-b-[2rem] overflow-hidden bg-white">
                     <img src="{{ isset($siteSettings['cover_image']) && $siteSettings['cover_image'] != '' ? asset($siteSettings['cover_image']) : asset('images/oztaylan_logo.jpg') }}"
                         class="w-full h-full object-contain py-16 px-8 mix-blend-multiply" alt="">
-                    <div class="absolute inset-0 bg-gradient-to-t from-brand-bg from-5% via-transparent to-transparent"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-bg from-5% via-transparent to-transparent">
+                    </div>
 
                     <div class="absolute top-4 md:top-6 right-6 flex items-center gap-3 z-20">
                         <div
@@ -272,32 +274,41 @@
                         {!! $siteSettings['slogan'] ?? 'Harika Tatlar,<br>Güzel Anılar...' !!}
                     </h1>
 
-                    <div class="w-full max-w-sm bg-white border border-gray-100 rounded-3xl p-5 shadow-sm flex flex-col gap-4 text-left font-poppins text-xs text-gray-600 mb-6">
+                    <div
+                        class="w-full max-w-sm bg-white border border-gray-100 rounded-3xl p-5 shadow-sm flex flex-col gap-4 text-left font-poppins text-xs text-gray-600 mb-6">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+                            <div
+                                class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
                                 <i class="fa-regular fa-clock text-base"></i>
                             </div>
                             <div>
-                                <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Çalışma Saatleri</p>
-                                <p class="text-gray-800 font-medium mt-0.5">{{ $siteSettings['working_hours'] ?? '09:00 - 02:00' }}</p>
+                                <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Çalışma
+                                    Saatleri</p>
+                                <p class="text-gray-800 font-medium mt-0.5">
+                                    {{ $siteSettings['working_hours'] ?? '09:00 - 02:00' }}</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+                            <div
+                                class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
                                 <i class="fa-solid fa-location-dot text-base"></i>
                             </div>
                             <div>
                                 <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Adres</p>
-                                <p class="text-gray-800 font-medium mt-0.5 leading-relaxed">{{ $siteSettings['address'] ?? 'Hacı Yusuf, Kaşif Acar Cd. No: 2/A, 10200 Bandırma/Balıkesir' }}</p>
+                                <p class="text-gray-800 font-medium mt-0.5 leading-relaxed">
+                                    {{ $siteSettings['address'] ?? 'Hacı Yusuf, Kaşif Acar Cd. No: 2/A, 10200 Bandırma/Balıkesir' }}
+                                </p>
                             </div>
                         </div>
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+                            <div
+                                class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
                                 <i class="fa-solid fa-phone text-base"></i>
                             </div>
                             <div>
                                 <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Telefon</p>
-                                <a href="tel:{{ $siteSettings['phone'] ?? '05334084611' }}" class="text-[#8C6C47] hover:underline font-semibold mt-0.5 block">{{ $siteSettings['phone'] ?? '05334084611' }}</a>
+                                <a href="tel:{{ $siteSettings['phone'] ?? '05334084611' }}"
+                                    class="text-[#8C6C47] hover:underline font-semibold mt-0.5 block">{{ $siteSettings['phone'] ?? '05334084611' }}</a>
                             </div>
                         </div>
                         @php
@@ -308,7 +319,8 @@
                             }
                         @endphp
                         <div class="flex items-center justify-between border-t border-gray-100 pt-3 mt-1">
-                            <a href="{{ $siteSettings['instagram_url'] ?? 'https://www.instagram.com/oztaylansutevi?igsh=amt1cW1qaW43Zm1k' }}" target="_blank"
+                            <a href="{{ $siteSettings['instagram_url'] ?? 'https://www.instagram.com/oztaylansutevi?igsh=amt1cW1qaW43Zm1k' }}"
+                                target="_blank"
                                 class="flex items-center gap-2 text-xs text-pink-600 hover:underline font-semibold">
                                 <i class="fa-brands fa-instagram text-base"></i> <span>Instagram</span>
                             </a>
@@ -318,7 +330,8 @@
                             </a>
                         </div>
                     </div>
-                    <a href="https://www.google.com/search?client=firefox-b-d&hs=rIMq&sa=X&sca_esv=3e69f37c1e17d2ac&sxsrf=APpeQntEY5wgTD9sHwOeaN0Jq8LXoxnKLA:1785492779306&q=%C3%96ztaylan+S%C3%BCtevi+Yorumlar&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxI2tLQ0MTM2sLAwMjQ3MjAHwQ2MjK8YpQ5PqypJrMxJzFMIPrynJLUsUyEyv6g0NyexaBErHkkA07rjC1QAAAA&rldimm=1994630882172070707&tbm=lcl&hl=tr-TR&ved=2ahUKEwiV3u_21vyVAxXc1gIHHaC3MwkQ9fQKegQIORAG&biw=630&bih=1056&dpr=0.88#lkt=LocalPoiReviews" target="_blank"
+                    <a href="https://www.google.com/search?client=firefox-b-d&hs=rIMq&sa=X&sca_esv=3e69f37c1e17d2ac&sxsrf=APpeQntEY5wgTD9sHwOeaN0Jq8LXoxnKLA:1785492779306&q=%C3%96ztaylan+S%C3%BCtevi+Yorumlar&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxI2tLQ0MTM2sLAwMjQ3MjAHwQ2MjK8YpQ5PqypJrMxJzFMIPrynJLUsUyEyv6g0NyexaBErHkkA07rjC1QAAAA&rldimm=1994630882172070707&tbm=lcl&hl=tr-TR&ved=2ahUKEwiV3u_21vyVAxXc1gIHHaC3MwkQ9fQKegQIORAG&biw=630&bih=1056&dpr=0.88#lkt=LocalPoiReviews"
+                        target="_blank"
                         class="w-full max-w-sm bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-2xl p-4 shadow-md flex items-center justify-between gap-3 mb-6 transition-all duration-300 transform hover:scale-[1.02] cursor-pointer font-poppins">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
@@ -326,7 +339,8 @@
                             </div>
                             <div class="text-left">
                                 <h4 class="font-bold text-sm tracking-wide">Yorum Bırakın</h4>
-                                <p class="text-[10px] text-white/80">Deneyiminizi Google'da paylaşarak bize destek olun.</p>
+                                <p class="text-[10px] text-white/80">Deneyiminizi Google'da paylaşarak bize destek olun.
+                                </p>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right text-white/80 text-sm"></i>
@@ -345,8 +359,10 @@
 
                 <div class="w-full max-w-5xl mx-auto px-6 mt-4">
                     <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-brand-text font-serif font-bold text-base tracking-wide text-left">Kategoriler</h3>
-                        <button id="category-back-btn" onclick="goBackCategory()" class="hidden text-sm font-semibold text-[#8C6C47] hover:text-black flex items-center gap-1.5 transition-colors">
+                        <h3 class="text-brand-text font-serif font-bold text-base tracking-wide text-left">Kategoriler
+                        </h3>
+                        <button id="category-back-btn" onclick="goBackCategory()"
+                            class="hidden text-sm font-semibold text-[#8C6C47] hover:text-black flex items-center gap-1.5 transition-colors">
                             <i class="fa-solid fa-chevron-left"></i> Üst Kategori
                         </button>
                     </div>
@@ -360,7 +376,9 @@
                 <div class="flex flex-col gap-4 max-w-2xl mx-auto mb-6">
                     <div class="flex md:hidden items-center justify-between">
                         <div class="w-12"></div>
-                        <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-14 object-contain cursor-pointer mix-blend-multiply" onclick="switchView('home')" alt="Logo">
+                        <img src="{{ asset('images/oztaylan_logo.jpg') }}"
+                            class="h-14 object-contain cursor-pointer mix-blend-multiply" onclick="switchView('home')"
+                            alt="Logo">
 
                         <div class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs font-bold shadow-sm">
                             <span data-i18n="tableLabel">Masa:</span> <span class="current-table-display">-</span>
@@ -375,7 +393,8 @@
                 </div>
 
                 <div class="w-full max-w-2xl mx-auto mb-6">
-                    <div id="menu-main-categories" class="flex overflow-x-auto gap-3 no-scrollbar pb-1 w-full scroll-smooth">
+                    <div id="menu-main-categories"
+                        class="flex overflow-x-auto gap-3 no-scrollbar pb-1 w-full scroll-smooth">
                     </div>
                 </div>
 
@@ -401,10 +420,12 @@
 
                 <div id="subcategories-container" class="w-full max-w-2xl mx-auto mb-6 hidden">
                     <div class="flex items-center gap-3">
-                        <button onclick="switchView('home')" class="w-10 h-10 rounded-full bg-gray-600 hover:bg-[#8C6C47] text-white flex items-center justify-center transition-colors shrink-0 shadow-sm">
+                        <button onclick="switchView('home')"
+                            class="w-10 h-10 rounded-full bg-gray-600 hover:bg-[#8C6C47] text-white flex items-center justify-center transition-colors shrink-0 shadow-sm">
                             <i class="fa-solid fa-chevron-left text-sm"></i>
                         </button>
-                        <div id="subcategories-list" class="flex-1 flex overflow-x-auto gap-2.5 no-scrollbar pb-1 scroll-smooth">
+                        <div id="subcategories-list"
+                            class="flex-1 flex overflow-x-auto gap-2.5 no-scrollbar pb-1 scroll-smooth">
                         </div>
                     </div>
                 </div>
@@ -454,14 +475,17 @@
             </footer>
         </main>
 
-        <button onclick="window.dispatchEvent(new CustomEvent('open-cart'))" class="fixed bottom-24 right-6 md:bottom-8 md:right-8 bg-brand-gold/90 hover:bg-brand-gold backdrop-blur text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center z-[50] transition-all hover:scale-110 duration-300">
+        <button onclick="window.dispatchEvent(new CustomEvent('open-cart'))"
+            class="fixed bottom-24 right-6 md:bottom-8 md:right-8 bg-brand-gold/90 hover:bg-brand-gold backdrop-blur text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center z-[50] transition-all hover:scale-110 duration-300">
             <i class="fa-solid fa-basket-shopping text-xl"></i>
-            <span id="floating-cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-[10px] font-extrabold w-5 h-5 flex items-center justify-center border-2 border-white {{ \Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') == 0 ? 'hidden' : '' }}">
+            <span id="floating-cart-count"
+                class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-[10px] font-extrabold w-5 h-5 flex items-center justify-center border-2 border-white {{ \Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') == 0 ? 'hidden' : '' }}">
                 {{ \Darryldecode\Cart\Facades\CartFacade::getContent()->sum('quantity') }}
             </span>
         </button>
 
-        <button onclick="callWaiter()" class="fixed bottom-24 left-6 md:bottom-8 md:left-8 bg-brand-gold/90 hover:bg-brand-gold backdrop-blur text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center z-[50] transition-all hover:scale-110 duration-300">
+        <button onclick="callWaiter()"
+            class="fixed bottom-24 left-6 md:bottom-8 md:left-8 bg-brand-gold/90 hover:bg-brand-gold backdrop-blur text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center z-[50] transition-all hover:scale-110 duration-300">
             <i class="fa-solid fa-bell-concierge text-xl"></i>
         </button>
 
@@ -517,11 +541,14 @@
 
                 <div class="p-6 bg-white border-t border-gray-100 flex items-center justify-between gap-4 shrink-0">
                     <div class="flex items-center bg-gray-50 border border-gray-200 rounded-xl">
-                        <button id="modal-qty-minus" onclick="adjustModalQty(-1)" class="px-4 py-2.5 text-gray-500 hover:text-brand-text font-bold transition-colors">-</button>
+                        <button id="modal-qty-minus" onclick="adjustModalQty(-1)"
+                            class="px-4 py-2.5 text-gray-500 hover:text-brand-text font-bold transition-colors">-</button>
                         <span id="modal-qty-display" class="px-2 font-semibold text-sm w-8 text-center">1</span>
-                        <button id="modal-qty-plus" onclick="adjustModalQty(1)" class="px-4 py-2.5 text-gray-500 hover:text-brand-text font-bold transition-colors">+</button>
+                        <button id="modal-qty-plus" onclick="adjustModalQty(1)"
+                            class="px-4 py-2.5 text-gray-500 hover:text-brand-text font-bold transition-colors">+</button>
                     </div>
-                    <button id="modal-add-to-cart-btn" onclick="addModalItemToCart()" class="flex-1 py-3 bg-brand-gold hover:bg-[#735738] text-white rounded-xl font-bold transition-colors shadow-md flex items-center justify-center gap-2">
+                    <button id="modal-add-to-cart-btn" onclick="addModalItemToCart()"
+                        class="flex-1 py-3 bg-brand-gold hover:bg-[#735738] text-white rounded-xl font-bold transition-colors shadow-md flex items-center justify-center gap-2">
                         <i class="fa-solid fa-basket-shopping"></i>
                         <span>Sepete Ekle</span>
                     </button>
@@ -530,8 +557,6 @@
             </div>
         </div>
     </div>
-
-    <livewire:cart-drawer />
 
     @livewireScripts
 
@@ -740,7 +765,7 @@
                 const imgUrl = getImageUrl(cat.image_url);
                 const catName = cat.name.trim().toUpperCase();
                 const safeName = catName.replace(/'/g, "\\'");
-                
+
                 const isCurrentlyActive = (cat.id == window.activeRootCategoryId);
                 const activeClass = isCurrentlyActive ? 'border-2 border-[#8C6C47] scale-[1.03] shadow-sm' : 'border border-gray-200 opacity-75';
 
@@ -775,18 +800,18 @@
 
             const container = document.getElementById('subcategories-container');
             const list = document.getElementById('subcategories-list');
-            
+
             container.classList.remove('hidden');
             list.innerHTML = '';
 
             const parentCat = window.appCategories.find(c => c.id == parentId);
             const children = window.appCategories.filter(c => c.parent_id == parentId);
-            
+
             children.forEach(child => {
                 const isActive = (child.id == subId);
                 const activeClass = isActive ? 'border-2 border-[#8C6C47] text-[#8C6C47] font-bold shadow-sm' : 'border border-gray-200 text-gray-700 hover:bg-gray-50';
                 const trimmedName = child.name.trim();
-                
+
                 list.innerHTML += `
                     <div onclick="selectSubcategory(${child.id}, '${child.name.replace(/'/g, "\\'")}', ${parentId})" 
                          class="bg-white rounded-[12px] h-[50px] px-5 flex items-center justify-center text-xs font-bold uppercase tracking-wider cursor-pointer whitespace-nowrap transition-all ${activeClass}">
@@ -799,7 +824,7 @@
                 const isActive = (parentId == subId);
                 const activeClass = isActive ? 'border-2 border-[#8C6C47] text-[#8C6C47] font-bold shadow-sm' : 'border border-gray-200 text-gray-700 hover:bg-gray-50';
                 const trimmedParentName = parentCat.name.trim();
-                
+
                 list.innerHTML += `
                     <div onclick="selectSubcategory(${parentCat.id}, '${parentCat.name.replace(/'/g, "\\'")}', ${parentId})" 
                          class="bg-white rounded-[12px] h-[50px] px-5 flex items-center justify-center text-xs font-bold uppercase tracking-wider cursor-pointer whitespace-nowrap transition-all ${activeClass}">
@@ -1080,7 +1105,7 @@
 
         window.addEventListener('cart-updated', event => {
             const count = event.detail.count !== undefined ? event.detail.count : (event.detail[0] && event.detail[0].count !== undefined ? event.detail[0].count : 0);
-            
+
             const badge = document.getElementById('floating-cart-count');
             if (badge) {
                 badge.innerText = count;
@@ -1106,7 +1131,7 @@
         function callWaiter() {
             const urlParams = new URLSearchParams(window.location.search);
             let tableToken = urlParams.get('masa') || urlParams.get('table') || 'Bilinmeyen Masa';
-            
+
             fetch('/api/waiter/call', {
                 method: 'POST',
                 headers: {
@@ -1116,17 +1141,17 @@
                 },
                 body: JSON.stringify({ table_token: tableToken })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data && data.status === 'success') {
-                    alert(translations[currentLang].waiterCalledSuccess || 'Garson çağırma talebi iletildi.');
-                } else {
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.status === 'success') {
+                        alert(translations[currentLang].waiterCalledSuccess || 'Garson çağırma talebi iletildi.');
+                    } else {
+                        alert('Bir hata oluştu.');
+                    }
+                })
+                .catch(() => {
                     alert('Bir hata oluştu.');
-                }
-            })
-            .catch(() => {
-                alert('Bir hata oluştu.');
-            });
+                });
         }
     </script>
 </body>

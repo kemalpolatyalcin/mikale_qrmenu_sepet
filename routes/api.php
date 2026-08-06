@@ -22,6 +22,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/products', [AdminController::class, 'storeProduct']);
     Route::post('/products/{id}', [AdminController::class, 'updateProduct']);
     Route::delete('/products/{id}', [AdminController::class, 'deleteProduct']);
+    Route::post('/categories', [AdminController::class, 'storeCategory']);
+    Route::post('/categories/{id}', [AdminController::class, 'updateCategory']);
+    Route::delete('/categories/{id}', [AdminController::class, 'deleteCategory']);
 });
 
 Route::prefix('erest')->group(function () {

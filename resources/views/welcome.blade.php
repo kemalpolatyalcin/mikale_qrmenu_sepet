@@ -871,42 +871,73 @@
                 .catch(err => console.error(err));
         }
 
+        function generateProductHtml(product) {
+            const imgUrl = getImageUrl(product.image_url);
+            const safeName = product.name.replace(/'/g, "\\'");
+            const kcalText = product.calories ? `${product.calories} kcal` : '250 kcal';
+            const timeText = product.prep_time ? `${product.prep_time} min` : '15 min';
+            const glutenText = product.is_gluten_free ? ' (Gluten Free)' : '';
+
+            return `
+                <div onclick="openProductModal(${product.id})" class="bg-white rounded-[1.5rem] overflow-hidden shadow-sm border border-gray-100 cursor-pointer transition-transform duration-300 hover:-translate-y-1 flex flex-col animate-fade-in-up">
+                    <div class="relative w-full h-32 bg-gray-50">
+                        <img src="${imgUrl}" class="w-full h-full object-cover" alt="">
+                    </div>
+                    <div class="p-4 flex flex-col justify-between flex-1">
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-sm line-clamp-1">${product.name}</h4>
+                            <div class="flex items-center gap-1.5 text-[9px] text-gray-400 font-semibold mt-1">
+                                <span><i class="fa-solid fa-fire text-orange-400 mr-0.5"></i> ${kcalText}</span>
+                                <span><i class="fa-regular fa-clock mr-0.5 text-gray-400"></i> ${timeText}${glutenText}</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center mt-3 pt-2">
+                            <span class="font-extrabold text-gray-900 text-sm">${currencySymbol}${product.price}</span>
+                            <button onclick="event.stopPropagation(); quickAddToCart(${product.id})" class="w-8 h-8 rounded-full bg-brand-gold hover:bg-[#735738] text-white flex items-center justify-center shadow-sm transition-transform hover:scale-110">
+                                <i class="fa-solid fa-plus text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         function renderProducts(products, activeCategoryName) {
             const container = document.getElementById('products-grid');
             let nameStr = activeCategoryName || '';
             document.getElementById('dynamic-products-title').innerText = nameStr.charAt(0).toUpperCase() + nameStr.slice(1).toLowerCase();
             let html = '';
 
-            products.forEach(product => {
-                const imgUrl = getImageUrl(product.image_url);
-                const safeName = product.name.replace(/'/g, "\\'");
-                const kcalText = product.calories ? `${product.calories} kcal` : '250 kcal';
-                const timeText = product.prep_time ? `${product.prep_time} min` : '15 min';
-                const glutenText = product.is_gluten_free ? ' (Gluten Free)' : '';
+            const currentCat = window.appCategories.find(c => c.id == activeCategoryId);
+            const hasChildren = currentCat ? window.appCategories.some(c => c.parent_id == currentCat.id) : false;
 
-                html += `
-                    <div onclick="openProductModal(${product.id})" class="bg-white rounded-[1.5rem] overflow-hidden shadow-sm border border-gray-100 cursor-pointer transition-transform duration-300 hover:-translate-y-1 flex flex-col animate-fade-in-up">
-                        <div class="relative w-full h-32 bg-gray-50">
-                            <img src="${imgUrl}" class="w-full h-full object-cover" alt="">
-                        </div>
-                        <div class="p-4 flex flex-col justify-between flex-1">
-                            <div>
-                                <h4 class="font-bold text-gray-900 text-sm line-clamp-1">${product.name}</h4>
-                                <div class="flex items-center gap-1.5 text-[9px] text-gray-400 font-semibold mt-1">
-                                    <span><i class="fa-solid fa-fire text-orange-400 mr-0.5"></i> ${kcalText}</span>
-                                    <span><i class="fa-regular fa-clock mr-0.5 text-gray-400"></i> ${timeText}${glutenText}</span>
-                                </div>
+            if (currentCat && !currentCat.parent_id && hasChildren) {
+                const children = window.appCategories.filter(c => c.parent_id == currentCat.id);
+                const parentProducts = products.filter(p => p.category_id == currentCat.id);
+                if (parentProducts.length > 0) {
+                    parentProducts.forEach(product => {
+                        html += generateProductHtml(product);
+                    });
+                }
+
+                children.forEach(subCat => {
+                    const subProducts = products.filter(p => p.category_id == subCat.id);
+                    if (subProducts.length > 0) {
+                        html += `
+                            <div class="col-span-full mt-6 mb-2 border-b border-gray-200 pb-2">
+                                <h4 class="font-serif text-lg md:text-xl font-bold text-[#8C6C47] uppercase tracking-wider">${subCat.name}</h4>
                             </div>
-                            <div class="flex justify-between items-center mt-3 pt-2">
-                                <span class="font-extrabold text-gray-900 text-sm">${currencySymbol}${product.price}</span>
-                                <button onclick="event.stopPropagation(); quickAddToCart(${product.id})" class="w-8 h-8 rounded-full bg-brand-gold hover:bg-[#735738] text-white flex items-center justify-center shadow-sm transition-transform hover:scale-110">
-                                    <i class="fa-solid fa-plus text-xs"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
+                        `;
+                        subProducts.forEach(product => {
+                            html += generateProductHtml(product);
+                        });
+                    }
+                });
+            } else {
+                products.forEach(product => {
+                    html += generateProductHtml(product);
+                });
+            }
 
             container.innerHTML = html;
             renderRecommendedProducts();

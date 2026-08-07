@@ -6,55 +6,60 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 
-Route::get('/', function (\Illuminate\Http\Request $request) {
-    $tableToken = $request->query('masa') ?? $request->query('table');
-    $restaurant = null;
-    if ($tableToken) {
-        $table = \App\Models\Table::where('token', $tableToken)->first();
-        if ($table) {
-            $restaurant = \App\Models\Restaurant::find($table->restaurant_id);
-            
-            $sessionKey = 'table_session_' . $table->id;
-            if (!session()->has($sessionKey) || session($sessionKey) !== $table->active_session_id) {
-                \Darryldecode\Cart\Facades\CartFacade::clear();
-                session([$sessionKey => $table->active_session_id]);
+Route::middleware(['validate.table.session', 'ip.limiter'])->group(function () {
+    Route::get('/', function (\Illuminate\Http\Request $request) {
+        $tableToken = $request->query('masa') ?? $request->query('table');
+        $restaurant = null;
+        if ($tableToken) {
+            $table = \App\Models\Table::where('token', $tableToken)->first();
+            if ($table) {
+                $restaurant = \App\Models\Restaurant::find($table->restaurant_id);
+                
+                $sessionKey = 'table_session_' . $table->id;
+                if (!session()->has($sessionKey) || session($sessionKey) !== $table->active_session_id) {
+                    \Darryldecode\Cart\Facades\CartFacade::clear();
+                    session([$sessionKey => $table->active_session_id]);
+                }
             }
         }
-    }
-    if (!$restaurant) {
-        if (session()->has('active_restaurant_id')) {
-            $restaurant = \App\Models\Restaurant::find(session('active_restaurant_id'));
-        }
         if (!$restaurant) {
-            $restaurant = \App\Models\Restaurant::first();
+            if (session()->has('active_restaurant_id')) {
+                $restaurant = \App\Models\Restaurant::find(session('active_restaurant_id'));
+            }
+            if (!$restaurant) {
+                $restaurant = \App\Models\Restaurant::first();
+            }
         }
-    }
 
-    $siteSettings = [];
-    if ($restaurant) {
-        $siteSettings = \App\Models\Setting::where('restaurant_id', $restaurant->id)->pluck('value', 'key')->toArray();
-        if (empty($siteSettings['restaurant_name'])) {
-            $siteSettings['restaurant_name'] = $restaurant->name;
+        $siteSettings = [];
+        if ($restaurant) {
+            $siteSettings = \App\Models\Setting::where('restaurant_id', $restaurant->id)->pluck('value', 'key')->toArray();
+            if (empty($siteSettings['restaurant_name'])) {
+                $siteSettings['restaurant_name'] = $restaurant->name;
+            }
+            if (empty($siteSettings['logo'])) {
+                $siteSettings['logo'] = $restaurant->logo_url;
+            }
+            if (empty($siteSettings['cover_image'])) {
+                $siteSettings['cover_image'] = $restaurant->cover_image_url;
+            }
+            if (empty($siteSettings['phone'])) {
+                $siteSettings['phone'] = $restaurant->phone;
+            }
+            if (empty($siteSettings['address'])) {
+                $siteSettings['address'] = $restaurant->address;
+            }
+        } else {
+            $siteSettings = \App\Models\Setting::pluck('value', 'key')->toArray();
         }
-        if (empty($siteSettings['logo'])) {
-            $siteSettings['logo'] = $restaurant->logo_url;
-        }
-        if (empty($siteSettings['cover_image'])) {
-            $siteSettings['cover_image'] = $restaurant->cover_image_url;
-        }
-        if (empty($siteSettings['phone'])) {
-            $siteSettings['phone'] = $restaurant->phone;
-        }
-        if (empty($siteSettings['address'])) {
-            $siteSettings['address'] = $restaurant->address;
-        }
-    } else {
-        $siteSettings = \App\Models\Setting::pluck('value', 'key')->toArray();
-    }
 
-    $restaurants = \App\Models\Restaurant::all();
+        $restaurants = \App\Models\Restaurant::all();
 
-    return view('welcome', compact('siteSettings', 'restaurants'));
+        return view('welcome', compact('siteSettings', 'restaurants'));
+    });
+
+    Route::post('/api/orders/place', [OrderController::class, 'placeOrder']);
+    Route::post('/api/waiter/call', [OrderController::class, 'callWaiter']);
 });
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -107,12 +112,13 @@ Route::middleware('developer.restaurant')->group(function () {
 
 Route::post('/api/login', [AuthController::class, 'apiLogin']);
 
-Route::get('/api/categories', [MenuController::class, 'getCategories']);
-Route::get('/api/products', [MenuController::class, 'getProducts']);
-Route::get('/api/tables/{token}', [MenuController::class, 'getTable']);
+Route::middleware('ip.limiter')->group(function () {
+    Route::get('/api/categories', [MenuController::class, 'getCategories']);
+    Route::get('/api/products', [MenuController::class, 'getProducts']);
+    Route::get('/api/tables/{token}', [MenuController::class, 'getTable']);
+});
 
-Route::post('/api/orders/place', [OrderController::class, 'placeOrder']);
-Route::post('/api/waiter/call', [OrderController::class, 'callWaiter']);
+
 
 Route::middleware('api.bearer')->prefix('api')->group(function () {
     Route::get('/sync/status', [\App\Http\Controllers\Api\SyncController::class, 'getStatus']);

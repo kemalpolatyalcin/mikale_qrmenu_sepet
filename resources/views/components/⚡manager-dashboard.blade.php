@@ -73,6 +73,8 @@ new class extends Component {
         $table = Table::where('name', $this->selectedTableName)->where('restaurant_id', $restaurantId)->first();
         if ($table) {
             $table->active_session_id = Str::random(40);
+            $table->session_token = Str::random(32);
+            $table->session_expires_at = now()->addHours(2);
             $table->save();
         }
 
@@ -99,6 +101,8 @@ new class extends Component {
         $table = Table::where('name', $tableName)->where('restaurant_id', $restaurantId)->first();
         if ($table) {
             $table->active_session_id = Str::random(40);
+            $table->session_token = Str::random(32);
+            $table->session_expires_at = now()->addHours(2);
             $table->save();
         }
 

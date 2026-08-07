@@ -15,6 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'api.bearer' => \App\Http\Middleware\ApiBearerTokenAuth::class,
             'developer.restaurant' => \App\Http\Middleware\DeveloperActiveRestaurant::class,
+            'validate.table.session' => \App\Http\Middleware\ValidateTableSession::class,
+            'ip.limiter' => \App\Http\Middleware\AdvancedIpRateLimiter::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

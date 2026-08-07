@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use App\Models\Table;
 
 class OrderApiTest extends TestCase
 {
@@ -11,7 +12,15 @@ class OrderApiTest extends TestCase
 
     public function test_can_place_order_via_api()
     {
-        $response = $this->postJson('/api/orders/place', [
+        $table = Table::create([
+            'name' => 'Masa 5',
+            'token' => 'masa-5-token',
+            'restaurant_id' => 1,
+            'session_token' => 'abc123token',
+            'session_expires_at' => now()->addMinutes(30)
+        ]);
+
+        $response = $this->postJson('/api/orders/place?token=abc123token', [
             'table_number' => 'Masa 5',
             'total_amount' => 360.00,
             'cutlery_requested' => true,
@@ -56,7 +65,15 @@ class OrderApiTest extends TestCase
 
     public function test_can_fetch_orders_via_api()
     {
-        $this->postJson('/api/orders/place', [
+        $table = Table::create([
+            'name' => 'Masa 2',
+            'token' => 'masa-2-token',
+            'restaurant_id' => 1,
+            'session_token' => 'abc456token',
+            'session_expires_at' => now()->addMinutes(30)
+        ]);
+
+        $this->postJson('/api/orders/place?token=abc456token', [
             'table_number' => 'Masa 2',
             'total_amount' => 80.00,
             'items' => [

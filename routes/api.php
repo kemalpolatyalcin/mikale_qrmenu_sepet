@@ -6,10 +6,12 @@ use App\Http\Controllers\Api\AdminAuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ErestIntegrationController;
 
-Route::get('/products', [MenuController::class, 'getProducts']);
-Route::get('/categories', [MenuController::class, 'getCategories']);
-Route::get('/user', [MenuController::class, 'getUser']);
-Route::get('/tables/{token}', [MenuController::class, 'getTable']);
+Route::middleware('ip.limiter')->group(function () {
+    Route::get('/products', [MenuController::class, 'getProducts']);
+    Route::get('/categories', [MenuController::class, 'getCategories']);
+    Route::get('/user', [MenuController::class, 'getUser']);
+    Route::get('/tables/{token}', [MenuController::class, 'getTable']);
+});
 
 Route::post('/admin/login', [AdminAuthController::class, 'login'])->middleware([
     \Illuminate\Cookie\Middleware\EncryptCookies::class,

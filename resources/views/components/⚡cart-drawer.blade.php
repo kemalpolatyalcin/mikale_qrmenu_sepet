@@ -16,6 +16,15 @@ new class extends Component {
     public $paymentMethod = 'cash';
     public $orderNote = '';
     public $prepTime = 25;
+    public $couponCode = '';
+    public $discount = 0;
+
+    public function applyCoupon()
+    {
+        if ($this->couponCode === 'INDIRIM10') {
+            $this->discount = 10;
+        }
+    }
 
     #[On('cart-updated')]
     public function refreshCart()
@@ -113,7 +122,7 @@ new class extends Component {
             'total_amount' => Cart::getTotal(),
             'cutlery_requested' => $this->wantsCutlery,
             'payment_method' => $this->paymentMethod,
-            'coupon_code' => null,
+            'coupon_code' => $this->couponCode,
             'order_note' => $this->orderNote,
             'status' => 'pending',
             'restaurant_id' => $restaurantId,

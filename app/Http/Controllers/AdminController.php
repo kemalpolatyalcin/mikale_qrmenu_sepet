@@ -65,6 +65,7 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'parent_id' => 'nullable|integer|exists:categories,id',
             'parent_name' => 'nullable|string|max:255',
+            'sort_order' => 'nullable|integer',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
         ]);
 
@@ -89,6 +90,7 @@ class AdminController extends Controller
         $category->name = $request->name;
         $category->parent_id = $parentId;
         $category->restaurant_id = $restaurantId;
+        $category->sort_order = $request->filled('sort_order') ? $request->sort_order : (Category::where('restaurant_id', $restaurantId)->max('sort_order') + 1);
 
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
@@ -115,11 +117,13 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'parent_id' => 'nullable|integer|exists:categories,id',
             'parent_name' => 'nullable|string|max:255',
+            'sort_order' => 'nullable|integer',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
         ]);
 
         $category = Category::findOrFail($id);
         $category->name = $request->name;
+        $category->sort_order = $request->filled('sort_order') ? $request->sort_order : $category->sort_order;
 
         $restaurantId = $this->getActiveRestaurantId();
         if ($request->filled('parent_name')) {
@@ -163,7 +167,7 @@ class AdminController extends Controller
     private function buildCategoryTree($categories, $parentId = null, $depth = 0)
     {
         $branch = collect();
-        $filtered = $categories->where('parent_id', $parentId)->sortBy('name');
+        $filtered = $categories->where('parent_id', $parentId)->sortBy('name')->sortBy('sort_order');
         foreach ($filtered as $category) {
             $category->depth = $depth;
             $branch->push($category);
@@ -239,6 +243,9 @@ class AdminController extends Controller
             'description' => 'nullable|string',
             'calories' => 'nullable|integer',
             'prep_time' => 'nullable|integer',
+            'sort_order' => 'nullable|integer',
+            'recommended_sort_order' => 'nullable|integer',
+            'allergen_info' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
         ]);
 
@@ -251,6 +258,10 @@ class AdminController extends Controller
         $product->prep_time = $request->prep_time ?? 15;
         $product->is_gluten_free = $request->has('is_gluten_free') ? 1 : 0;
         $product->restaurant_id = $this->getActiveRestaurantId();
+        $product->sort_order = $request->filled('sort_order') ? $request->sort_order : (Product::where('restaurant_id', $product->restaurant_id)->max('sort_order') + 1);
+        $product->is_recommended = $request->has('is_recommended') ? 1 : 0;
+        $product->recommended_sort_order = $request->filled('recommended_sort_order') ? $request->recommended_sort_order : 0;
+        $product->allergen_info = $request->allergen_info;
 
         if ($request->hasFile('image')) {
             $imageName = time() . '_prod.' . $request->image->extension();
@@ -280,7 +291,10 @@ class AdminController extends Controller
             'price' => 'required|numeric',
             'description' => 'nullable|string',
             'calories' => 'nullable|integer',
-            'prep_time' => 'nullable|integer'
+            'prep_time' => 'nullable|integer',
+            'sort_order' => 'nullable|integer',
+            'recommended_sort_order' => 'nullable|integer',
+            'allergen_info' => 'nullable|string'
         ]);
 
         $product = Product::findOrFail($id);
@@ -291,6 +305,10 @@ class AdminController extends Controller
         $product->calories = $request->calories ?? 0;
         $product->prep_time = $request->prep_time ?? 15;
         $product->is_gluten_free = $request->has('is_gluten_free') ? 1 : 0;
+        $product->sort_order = $request->filled('sort_order') ? $request->sort_order : $product->sort_order;
+        $product->is_recommended = $request->has('is_recommended') ? 1 : 0;
+        $product->recommended_sort_order = $request->filled('recommended_sort_order') ? $request->recommended_sort_order : 0;
+        $product->allergen_info = $request->allergen_info;
 
         if ($request->hasFile('image')) {
             if ($product->image_url && File::exists(public_path($product->image_url))) {
@@ -577,6 +595,28 @@ class AdminController extends Controller
             $data['description'] = $latestOrder->items->map(fn($item) => $item->quantity . 'x ' . $item->product_name)->join(', ');
         }
         return response()->json($data);
+    }
+
+    public function getNotifications(Request $request)
+    {
+        $restaurantId = $this->getActiveRestaurantId();
+        $orders = \App\Models\Order::with('items')
+            ->where('restaurant_id', $restaurantId)
+            ->latest('id')
+            ->limit(15)
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'table_number' => $order->table_number,
+                    'total_amount' => $order->total_amount,
+                    'order_note' => $order->order_note,
+                    'created_at' => $order->created_at->diffForHumans(),
+                    'is_waiter_call' => str_contains(strtolower($order->order_note ?? ''), 'garson') || $order->total_amount == 0,
+                    'items_summary' => $order->items->map(fn($i) => $i->quantity . 'x ' . $i->product_name)->join(', ')
+                ];
+            });
+        return response()->json($orders);
     }
 
     public function register(Request $request)

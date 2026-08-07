@@ -79,13 +79,16 @@ class OrderController
             $restaurantId = $default ? $default->id : null;
         }
 
+        $reason = $request->input('reason', 'Genel Çağrı');
+        $note = 'Garson Çağırıldı (' . $reason . ')';
+
         $order = Order::create([
             'table_number' => $tableNumber,
             'total_amount' => 0,
             'cutlery_requested' => false,
             'payment_method' => 'cash',
             'coupon_code' => null,
-            'order_note' => 'Garson Çağırıldı',
+            'order_note' => $note,
             'status' => 'pending',
             'restaurant_id' => $restaurantId
         ]);
@@ -93,7 +96,7 @@ class OrderController
         OrderItem::create([
             'order_id' => $order->id,
             'product_id' => 0,
-            'product_name' => 'Garson Çağırıldı',
+            'product_name' => $note,
             'price' => 0,
             'quantity' => 1
         ]);

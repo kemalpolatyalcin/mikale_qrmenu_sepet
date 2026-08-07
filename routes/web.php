@@ -92,6 +92,7 @@ Route::middleware('developer.restaurant')->group(function () {
 
         Route::post('/restaurants/select', [AdminController::class, 'selectRestaurant'])->name('restaurants.select');
         Route::get('/api/new-orders-check', [AdminController::class, 'checkNewOrders'])->name('api.new-orders-check');
+        Route::get('/api/notifications', [AdminController::class, 'getNotifications'])->name('api.notifications');
     });
 
     Route::name('admin.')->group(function () {

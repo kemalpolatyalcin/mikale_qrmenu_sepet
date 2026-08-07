@@ -33,6 +33,7 @@
             scrollbar-width: none;
         }
     </style>
+    @livewireStyles
 </head>
 
 <body class="bg-[#F9F8F3] font-poppins flex h-screen w-full overflow-hidden">
@@ -42,36 +43,43 @@
     <div class="flex-1 flex flex-col h-screen min-w-0 bg-[#F9F8F3]">
 
         <header
-            class="md:hidden h-16 w-full bg-white border-b border-gray-100 px-6 flex items-center justify-between shrink-0 z-20">
-            <button id="mobileMenuBtn" onclick="document.getElementById('mobile-admin-menu').classList.remove('-translate-x-full')" class="text-gray-800 p-2 hover:bg-gray-50 rounded-lg transition-colors">
+            class="md:hidden h-16 w-full bg-white border-b border-gray-100 px-6 flex items-center justify-between shrink-0 z-20 relative">
+            <button id="mobileMenuBtn" onclick="document.getElementById('mobile-admin-menu').classList.remove('-translate-x-full')" class="text-gray-800 p-2 hover:bg-gray-50 rounded-lg transition-colors shrink-0 z-10">
                 <i class="fa-solid fa-bars text-xl"></i>
             </button>
-            @if(isset($activeRestaurant) && $activeRestaurant->logo_url)
-                <img src="{{ asset($activeRestaurant->logo_url) }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white" alt="Restaurant Logo">
-            @else
-                <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white mix-blend-multiply" alt="Restaurant Logo">
-            @endif
+            <span class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-gray-800 text-base truncate max-w-[50%] text-center">@yield('page_title', 'Yönetim Paneli')</span>
+            <div class="flex items-center gap-3 mobile-right-group shrink-0 z-10">
+                @if(isset($activeRestaurant) && $activeRestaurant->logo_url)
+                    <img src="{{ asset($activeRestaurant->logo_url) }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white" alt="Restaurant Logo">
+                @else
+                    <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white mix-blend-multiply" alt="Restaurant Logo">
+                @endif
+            </div>
         </header>
 
         <header
             class="hidden md:flex h-20 w-full bg-white border-b border-gray-100 px-8 items-center justify-between shrink-0 z-10">
             <div class="flex items-center gap-4">
-                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Yönetim Paneli</span>
+                <h2 class="text-xl font-semibold text-gray-800">@yield('page_title', 'Yönetim Paneli')</h2>
             </div>
 
             <div class="flex items-center gap-3">
-                @if(!request()->routeIs('admin.settings') && !request()->routeIs('admin.tables'))
+                @if(!request()->routeIs('admin.settings') && !request()->routeIs('admin.tables') && !request()->routeIs('admin.register') && !request()->routeIs('admin.orders'))
                 <a href="{{ url('/') }}" target="_blank"
                     class="bg-amber-50 hover:bg-amber-100 text-[#8C6C47] font-semibold text-xs px-4 py-2.5 rounded-xl border border-amber-100 transition-colors flex items-center gap-2">
                     <i class="fa-solid fa-eye text-xs"></i>
                     <span>Menüyü Görüntüle</span>
                 </a>
                 @endif
-                @if(isset($activeRestaurant) && $activeRestaurant->logo_url)
-                    <img src="{{ asset($activeRestaurant->logo_url) }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white" alt="Restaurant Logo">
-                @else
-                    <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white mix-blend-multiply" alt="Restaurant Logo">
-                @endif
+                <div class="flex items-center gap-3 border-l border-gray-100 pl-3">
+                    <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-bold border-2 border-[#8C6C47] shrink-0">
+                        {{ mb_substr(optional(Auth::user())->full_name ?? optional(Auth::user())->name ?? 'A', 0, 1, 'UTF-8') }}
+                    </div>
+                    <div class="hidden sm:block text-sm text-left">
+                        <p class="font-bold text-gray-800">{{ optional(Auth::user())->full_name ?? optional(Auth::user())->name ?? 'Yönetici' }}</p>
+                        <p class="text-xs text-gray-500">Admin</p>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -226,5 +234,6 @@
             });
         })();
     </script>
+    @livewireScripts
 </body>
 </html>

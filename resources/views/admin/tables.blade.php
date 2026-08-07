@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('page_title', 'Masalar ve QR')
+
 @section('content')
     <div class="max-w-6xl mx-auto">
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">

@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('page_title', 'Ayarlar')
+
 @section('content')
     <div class="max-w-4xl mx-auto pb-10">
         <div class="mb-8">

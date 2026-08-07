@@ -32,25 +32,32 @@
 
     <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
         <header
-            class="md:hidden bg-white/90 shadow-sm z-30 px-6 py-4 flex justify-between items-center border-b border-gray-100 shrink-0">
+            class="md:hidden bg-white/90 shadow-sm z-30 px-6 py-4 flex justify-between items-center border-b border-gray-100 shrink-0 relative">
             <button onclick="document.getElementById('mobile-admin-menu').classList.remove('-translate-x-full')"
-                class="text-gray-800 text-2xl focus:outline-none">
+                class="text-gray-800 text-2xl focus:outline-none shrink-0 z-10">
                 <i class="fa-solid fa-bars"></i>
             </button>
-            @if(isset($activeRestaurant) && $activeRestaurant->logo_url)
-                <img src="{{ asset($activeRestaurant->logo_url) }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white" alt="Restaurant Logo">
-            @else
-                <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white mix-blend-multiply" alt="Restaurant Logo">
-            @endif
+            <span class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-gray-800 text-base truncate max-w-[50%] text-center">Kategoriler</span>
+            <div class="flex items-center gap-3 mobile-right-group shrink-0 z-10">
+                @if(isset($activeRestaurant) && $activeRestaurant->logo_url)
+                    <img src="{{ asset($activeRestaurant->logo_url) }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white" alt="Restaurant Logo">
+                @else
+                    <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white mix-blend-multiply" alt="Restaurant Logo">
+                @endif
+            </div>
         </header>
 
         <header
             class="hidden md:flex h-20 bg-white/80 backdrop-blur-md items-center justify-between px-8 shadow-sm z-10 shrink-0">
-            <h2 class="text-xl font-semibold text-gray-800">Kategori Yönetimi</h2>
-            <div class="flex items-center gap-4">
+            <h2 class="text-xl font-semibold text-gray-800">Kategoriler</h2>
+            <div class="flex items-center gap-3 border-l border-gray-100 pl-3">
                 <div
-                    class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-bold border-2 border-[#8C6C47]">
+                    class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-bold border-2 border-[#8C6C47] shrink-0">
                     {{ mb_substr(optional(Auth::user())->full_name ?? optional(Auth::user())->name ?? 'A', 0, 1, 'UTF-8') }}
+                </div>
+                <div class="hidden sm:block text-sm text-left">
+                    <p class="font-bold text-gray-800">{{ optional(Auth::user())->full_name ?? optional(Auth::user())->name ?? 'Yönetici' }}</p>
+                    <p class="text-xs text-gray-500">Admin</p>
                 </div>
             </div>
         </header>
@@ -106,6 +113,12 @@
                             </div>
 
                             <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Sıra Numarası (Opsiyonel)</label>
+                                <input type="number" name="sort_order" placeholder="Örn: 1"
+                                    class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#8C6C47] focus:border-[#8C6C47] outline-none transition-all text-sm">
+                            </div>
+
+                            <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Kategori Görseli</label>
                                 <input type="file" name="image" accept="image/*"
                                     class="w-full px-4 py-2 rounded-xl border border-gray-300 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-[#8C6C47] hover:file:bg-amber-100 transition-all cursor-pointer">
@@ -142,7 +155,7 @@
                                         <td class="p-4 text-right space-x-2">
 
                                             <button
-                                                onclick="openEditModal({{ $category->id }}, '{{ addslashes($category->name) }}', '{{ $category->parent_id }}')"
+                                                onclick="openEditModal({{ $category->id }}, '{{ addslashes($category->name) }}', '{{ $category->parent_id }}', {{ $category->sort_order ?? 0 }})"
                                                 class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors">
                                                 <i class="fa-solid fa-pen text-xs"></i>
                                             </button>
@@ -207,6 +220,12 @@
                     </div>
 
                     <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Sıra Numarası</label>
+                        <input type="number" id="edit-sort-order" name="sort_order" placeholder="Örn: 1"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#8C6C47] focus:border-[#8C6C47] outline-none transition-all text-sm">
+                    </div>
+
+                    <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Yeni Görsel Seçin</label>
                         <input type="file" name="image" accept="image/*"
                             class="w-full px-4 py-2 rounded-xl border border-gray-300 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-[#8C6C47] hover:file:bg-amber-100 transition-all cursor-pointer">
@@ -225,12 +244,13 @@
     </main>
 
     <script>
-        function openEditModal(id, currentName, parentId) {
+        function openEditModal(id, currentName, parentId, sortOrder) {
 
             const form = document.getElementById('edit-form');
             form.action = `/admin/categories/update/${id}`;
 
             document.getElementById('edit-name').value = currentName;
+            document.getElementById('edit-sort-order').value = sortOrder || 0;
 
             const select = document.getElementById('edit-parent-id');
             select.value = parentId || '';

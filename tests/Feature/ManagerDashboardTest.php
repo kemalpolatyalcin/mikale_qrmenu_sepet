@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Table;
 use Tests\TestCase;
 
 class ManagerDashboardTest extends TestCase
@@ -16,15 +17,22 @@ class ManagerDashboardTest extends TestCase
     {
         $response = $this->get('/manager');
         $response->assertStatus(200);
-        $response->assertSee('Masa Sipariş Yönetim Paneli');
+        $response->assertSee('Masa Görünümü');
     }
 
-    public function test_manager_can_update_order_status()
+    public function test_manager_can_settle_bill()
     {
+        $table = Table::create([
+            'name' => 'Masa 4',
+            'token' => 'masa-4-token',
+            'restaurant_id' => 1
+        ]);
+
         $order = Order::create([
             'table_number' => 'Masa 4',
             'total_amount' => 150.00,
-            'status' => 'pending'
+            'status' => 'pending',
+            'restaurant_id' => 1
         ]);
 
         OrderItem::create([
@@ -37,9 +45,10 @@ class ManagerDashboardTest extends TestCase
 
         Livewire::test('manager-dashboard')
             ->assertSee('Masa 4')
-            ->assertSee('Bekliyor')
-            ->call('updateStatus', $order->id, 'preparing');
+            ->call('selectTable', 'Masa 4')
+            ->call('startSettlement')
+            ->call('settleBill');
 
-        $this->assertEquals('preparing', $order->fresh()->status);
+        $this->assertEquals('completed', $order->fresh()->status);
     }
 }

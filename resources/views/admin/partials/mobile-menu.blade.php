@@ -5,7 +5,11 @@
     <div class="absolute top-0 left-0 w-64 h-full bg-white shadow-xl flex flex-col justify-between py-6 px-4">
         <div>
             <div class="flex justify-between items-center mb-6 px-2 border-b border-gray-100 pb-4">
-                <span class="font-serif text-xl font-bold tracking-widest text-[#1C1C1C]">{{ isset($activeRestaurant) ? $activeRestaurant->name : ($siteSettings['restaurant_name'] ?? 'MIKALE') }}</span>
+                @if(isset($activeRestaurant) && $activeRestaurant->logo_url)
+                    <img src="{{ asset($activeRestaurant->logo_url) }}" class="h-10 object-contain" alt="Logo">
+                @else
+                    <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-10 object-contain mix-blend-multiply" alt="Logo">
+                @endif
                 <button onclick="document.getElementById('mobile-admin-menu').classList.add('-translate-x-full')"
                     class="text-gray-500 text-xl focus:outline-none"><i class="fa-solid fa-xmark"></i></button>
             </div>

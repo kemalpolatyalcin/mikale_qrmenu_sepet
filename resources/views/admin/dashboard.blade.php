@@ -32,29 +32,31 @@
 
     <main class="flex-1 flex flex-col h-screen overflow-y-auto">
         <header
-            class="md:hidden bg-white/90 shadow-sm z-30 px-6 py-4 flex justify-between items-center border-b border-gray-100 shrink-0">
+            class="md:hidden bg-white/90 shadow-sm z-30 px-6 py-4 flex justify-between items-center border-b border-gray-100 shrink-0 relative">
             <button onclick="document.getElementById('mobile-admin-menu').classList.remove('-translate-x-full')"
-                class="text-gray-800 text-2xl focus:outline-none">
+                class="text-gray-800 text-2xl focus:outline-none shrink-0 z-10">
                 <i class="fa-solid fa-bars"></i>
             </button>
-            @if(isset($activeRestaurant) && $activeRestaurant->logo_url)
-                <img src="{{ asset($activeRestaurant->logo_url) }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white" alt="Restaurant Logo">
-            @else
-                <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white mix-blend-multiply" alt="Restaurant Logo">
-            @endif
+            <span class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-gray-800 text-base truncate max-w-[50%] text-center">Gösterge Paneli</span>
+            <div class="flex items-center gap-3 mobile-right-group shrink-0 z-10">
+                @if(isset($activeRestaurant) && $activeRestaurant->logo_url)
+                    <img src="{{ asset($activeRestaurant->logo_url) }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white" alt="Restaurant Logo">
+                @else
+                    <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white mix-blend-multiply" alt="Restaurant Logo">
+                @endif
+            </div>
         </header>
 
         <header
             class="hidden md:flex h-20 bg-white/80 backdrop-blur-md items-center justify-between px-8 shadow-sm z-10 sticky top-0">
             <h2 class="text-xl font-semibold text-gray-800">Gösterge Paneli</h2>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3 border-l border-gray-100 pl-3">
                 <div
-                    class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-bold border-2 border-[#8C6C47]">
+                    class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-bold border-2 border-[#8C6C47] shrink-0">
                     {{ mb_substr(optional(Auth::user())->full_name ?? optional(Auth::user())->name ?? 'A', 0, 1, 'UTF-8') }}
                 </div>
-                <div class="hidden sm:block text-sm">
-                    <p class="font-bold text-gray-800">{{ optional(Auth::user())->full_name ?? optional(Auth::user())->name ?? 'Yönetici' }}
-                    </p>
+                <div class="hidden sm:block text-sm text-left">
+                    <p class="font-bold text-gray-800">{{ optional(Auth::user())->full_name ?? optional(Auth::user())->name ?? 'Yönetici' }}</p>
                     <p class="text-xs text-gray-500">Admin</p>
                 </div>
             </div>

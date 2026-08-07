@@ -29,7 +29,7 @@ class MenuController extends Controller
             }
         }
 
-        $categories = Category::where('restaurant_id', $restaurantId)->orderBy('id', 'asc')->get();
+        $categories = Category::where('restaurant_id', $restaurantId)->orderBy('sort_order', 'asc')->orderBy('id', 'asc')->get();
 
         return response()->json([
             'status' => 'success',
@@ -55,7 +55,7 @@ class MenuController extends Controller
             }
         }
 
-        $products = Product::where('restaurant_id', $restaurantId)->get();
+        $products = Product::where('restaurant_id', $restaurantId)->orderBy('sort_order', 'asc')->orderBy('id', 'asc')->get();
 
         return response()->json([
             'status' => 'success',

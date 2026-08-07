@@ -83,6 +83,29 @@
     </div>
 </aside>
 
+<div id="admin-notif-container" class="fixed top-3 right-16 md:top-5 md:right-[220px] z-[60] font-poppins">
+    <button id="admin-notif-btn" onclick="toggleAdminNotif()" class="relative w-10 h-10 md:w-11 md:h-11 rounded-full bg-white shadow-md border border-gray-100 hover:border-[#8C6C47] text-gray-700 flex items-center justify-center transition-all hover:scale-105">
+        <i class="fa-solid fa-bell text-lg md:text-xl"></i>
+        <span id="admin-notif-badge" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-[9px] font-extrabold w-5 h-5 flex items-center justify-center border-2 border-white hidden">0</span>
+    </button>
+
+    <div id="admin-notif-panel" class="absolute right-0 mt-3 w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 hidden flex-col overflow-hidden transform scale-95 opacity-0 origin-top-right transition-all duration-200 z-[200]">
+        <div class="px-5 py-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-envelope text-[#8C6C47]"></i>
+                <span>Mesaj Kutusu</span>
+            </h3>
+            <button onclick="markAllNotifAsRead()" class="text-xs text-[#8C6C47] hover:underline font-semibold">Tümünü Oku</button>
+        </div>
+        <div id="admin-notif-list" class="max-h-[350px] overflow-y-auto divide-y divide-gray-50 no-scrollbar">
+            <div class="p-6 text-center text-gray-400 text-xs">
+                <i class="fa-solid fa-spinner animate-spin text-base mb-2 block"></i>
+                Yükleniyor...
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     (function() {
         const token = localStorage.getItem('admin_token');
@@ -203,8 +226,10 @@
                 const closeBtn = notification.querySelector('button');
                 closeBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    notification.classList.add('translate-x-full', 'opacity-0');
-                    setTimeout(() => notification.remove(), 300);
+                    if (notification.parentNode) {
+                        notification.classList.add('translate-x-full', 'opacity-0');
+                        setTimeout(() => notification.remove(), 300);
+                    }
                 });
                 
                 setTimeout(() => {
@@ -226,5 +251,264 @@
                     .catch(() => {});
             }, 3000);
         }
+
+        let localNotifs = [];
+        let maxSeenId = parseInt(localStorage.getItem('admin_max_seen_id') || '0');
+
+        window.injectNotificationButton = function() {
+            const notifContainer = document.getElementById('admin-notif-container');
+            if (!notifContainer) return;
+
+            const placeholder = document.getElementById('desktop-notif-placeholder');
+            if (placeholder) {
+                if (notifContainer.parentNode !== placeholder) {
+                    notifContainer.className = 'relative font-poppins shrink-0';
+                    placeholder.appendChild(notifContainer);
+                }
+                return;
+            }
+
+            const isDesktop = window.innerWidth >= 768;
+            let profileEl = null;
+
+            if (isDesktop) {
+                const desktopHeaders = document.querySelectorAll('header:not(.md\\:hidden)');
+                for (let h of desktopHeaders) {
+                    let el = h.querySelector('img.h-10, div.w-10.h-10, img[alt*="Logo"], img[alt*="logo"]');
+                    if (el) {
+                        profileEl = el;
+                        break;
+                    }
+                }
+            } else {
+                const mobileHeader = document.querySelector('header.md\\:hidden');
+                if (mobileHeader) {
+                    profileEl = mobileHeader.querySelector('img.h-10, img[alt*="Logo"], img[alt*="logo"]');
+                }
+            }
+
+            if (profileEl) {
+                const parent = profileEl.parentNode;
+                if (parent.tagName === 'HEADER' && parent.classList.contains('justify-between')) {
+                    let wrap = parent.querySelector('.mobile-right-group');
+                    if (!wrap) {
+                        wrap = document.createElement('div');
+                        wrap.className = 'flex items-center gap-3 mobile-right-group';
+                        parent.insertBefore(wrap, profileEl);
+                        wrap.appendChild(profileEl);
+                    }
+                    if (notifContainer.parentNode !== wrap) {
+                        notifContainer.className = 'relative font-poppins shrink-0';
+                        wrap.insertBefore(notifContainer, profileEl);
+                    }
+                } else {
+                    if (notifContainer.parentNode !== parent) {
+                        notifContainer.className = 'relative font-poppins shrink-0 mr-2 md:mr-3';
+                        parent.insertBefore(notifContainer, profileEl);
+                    }
+                }
+            } else {
+                let target = null;
+                const managerHeader = document.querySelector('header div.flex.items-center.gap-3.w-full') || 
+                                      document.querySelector('header div.flex.items-center.gap-3');
+                if (managerHeader) {
+                    target = managerHeader;
+                }
+                if (!target) {
+                    const headers = document.querySelectorAll('header');
+                    headers.forEach(h => {
+                        if (!h.classList.contains('md:hidden')) {
+                            const groups = h.querySelectorAll('div.flex.items-center');
+                            if (groups.length > 0) {
+                                target = groups[groups.length - 1];
+                            }
+                        }
+                    });
+                }
+                if (!target) {
+                    const mobileHeader = document.querySelector('header.md\\:hidden');
+                    if (mobileHeader) {
+                        target = mobileHeader;
+                    }
+                }
+                if (target && notifContainer.parentNode !== target) {
+                    notifContainer.className = 'relative font-poppins shrink-0 ml-2 md:ml-3';
+                    target.appendChild(notifContainer);
+                }
+            }
+        };
+
+                window.toggleAdminNotif = function() {
+            const panel = document.getElementById('admin-notif-panel');
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                panel.classList.add('flex');
+                setTimeout(() => {
+                    panel.classList.remove('scale-95', 'opacity-0');
+                    panel.classList.add('scale-100', 'opacity-100');
+                }, 10);
+                loadNotifications();
+            } else {
+                panel.classList.remove('scale-100', 'opacity-100');
+                panel.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    panel.classList.remove('flex');
+                    panel.classList.add('hidden');
+                }, 200);
+            }
+        };
+
+        window.loadNotifications = function() {
+            fetch('/admin/api/notifications')
+                .then(res => res.json())
+                .then(data => {
+                    localNotifs = data;
+                    renderNotifications();
+                });
+        };
+
+        window.renderNotifications = function() {
+            window.injectNotificationButton();
+            const list = document.getElementById('admin-notif-list');
+            if (localNotifs.length === 0) {
+                list.innerHTML = `<div class="p-8 text-center text-gray-400 text-xs">Mesaj bulunmuyor.</div>`;
+                return;
+            }
+
+            let html = '';
+            localNotifs.forEach(n => {
+                const isUnread = n.id > maxSeenId;
+                const unreadClass = isUnread ? 'bg-amber-50/20 font-semibold' : '';
+                const bg = n.is_waiter_call ? 'bg-rose-50/40 hover:bg-rose-50/60' : 'bg-white hover:bg-gray-50';
+                const iconColor = n.is_waiter_call ? 'text-red-500 bg-red-50' : 'text-green-500 bg-green-50';
+                const icon = n.is_waiter_call ? 'fa-bell-concierge' : 'fa-basket-shopping';
+                const title = n.is_waiter_call ? `${n.table_number} - Garson Çağırıyor` : `${n.table_number} - Yeni Sipariş`;
+                const desc = n.is_waiter_call ? (n.order_note || 'Garson çağrısı iletildi.') : n.items_summary;
+                const price = n.is_waiter_call ? '' : `<span class="text-xs font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded-full">₺${n.total_amount}</span>`;
+
+                html += `
+                    <div class="p-4 flex gap-3 transition-colors ${bg} ${unreadClass}">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-base ${iconColor}">
+                            <i class="fa-solid ${icon}"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-start gap-2 mb-1">
+                                <h4 class="text-xs font-bold text-gray-900 truncate">${title}</h4>
+                                <span class="text-[10px] text-gray-400 whitespace-nowrap">${n.created_at}</span>
+                            </div>
+                            <p class="text-xs text-gray-500 line-clamp-2">${desc}</p>
+                            <div class="mt-2 flex items-center justify-between">
+                                ${price}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+        };
+
+        window.markAllNotifAsRead = function() {
+            if (localNotifs.length > 0) {
+                const maxId = Math.max(...localNotifs.map(n => n.id));
+                if (maxId > maxSeenId) {
+                    maxSeenId = maxId;
+                    localStorage.setItem('admin_max_seen_id', maxSeenId.toString());
+                    updateUnreadCount();
+                    renderNotifications();
+                }
+            }
+        };
+
+        window.updateUnreadCount = function() {
+            window.injectNotificationButton();
+            const badge = document.getElementById('admin-notif-badge');
+            const unreadCount = localNotifs.filter(n => n.id > maxSeenId).length;
+            if (badge) {
+                if (unreadCount > 0) {
+                    badge.innerText = unreadCount;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+        };
+
+        function playDingSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(659.25, audioCtx.currentTime);
+                gain1.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+                osc1.start(audioCtx.currentTime);
+                osc1.stop(audioCtx.currentTime + 0.6);
+
+                setTimeout(() => {
+                    const osc2 = audioCtx.createOscillator();
+                    const gain2 = audioCtx.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(audioCtx.destination);
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(880.00, audioCtx.currentTime);
+                    gain2.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+                    osc2.start(audioCtx.currentTime);
+                    osc2.stop(audioCtx.currentTime + 0.8);
+                }, 120);
+            } catch (e) {}
+        }
+
+        window.pollNotifications = function() {
+            window.injectNotificationButton();
+            fetch('/admin/api/notifications')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        const maxId = Math.max(...data.map(n => n.id));
+                        if (maxId > maxSeenId) {
+                            if (localNotifs.length > 0) {
+                                playDingSound();
+                            }
+                        }
+                        localNotifs = data;
+                        updateUnreadCount();
+                        const panel = document.getElementById('admin-notif-panel');
+                        if (panel && !panel.classList.contains('hidden')) {
+                            renderNotifications();
+                        }
+                    }
+                })
+                .catch(() => {});
+        };
+
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('admin-notif-panel');
+            const btn = document.getElementById('admin-notif-btn');
+            if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
+                if (!panel.classList.contains('hidden')) {
+                    panel.classList.remove('scale-100', 'opacity-100');
+                    panel.classList.add('scale-95', 'opacity-0');
+                    setTimeout(() => {
+                        panel.classList.remove('flex');
+                        panel.classList.add('hidden');
+                    }, 200);
+                }
+            }
+        });
+
+        window.injectNotificationButton();
+        document.addEventListener('DOMContentLoaded', window.injectNotificationButton);
+        window.addEventListener('load', window.injectNotificationButton);
+        window.addEventListener('resize', window.injectNotificationButton);
+        setTimeout(window.injectNotificationButton, 200);
+        setTimeout(window.injectNotificationButton, 1000);
+        setTimeout(window.injectNotificationButton, 3000);
+
+        setInterval(window.pollNotifications, 5000);
+        setTimeout(window.pollNotifications, 500);
     })();
 </script>

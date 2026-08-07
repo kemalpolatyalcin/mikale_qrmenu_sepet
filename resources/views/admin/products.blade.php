@@ -31,25 +31,32 @@
 
     <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
         <header
-            class="md:hidden bg-white/90 shadow-sm z-30 px-6 py-4 flex justify-between items-center border-b border-gray-100 shrink-0">
+            class="md:hidden bg-white/90 shadow-sm z-30 px-6 py-4 flex justify-between items-center border-b border-gray-100 shrink-0 relative">
             <button onclick="document.getElementById('mobile-admin-menu').classList.remove('-translate-x-full')"
-                class="text-gray-800 text-2xl focus:outline-none">
+                class="text-gray-800 text-2xl focus:outline-none shrink-0 z-10">
                 <i class="fa-solid fa-bars"></i>
             </button>
-            @if(isset($activeRestaurant) && $activeRestaurant->logo_url)
-                <img src="{{ asset($activeRestaurant->logo_url) }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white" alt="Restaurant Logo">
-            @else
-                <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white mix-blend-multiply" alt="Restaurant Logo">
-            @endif
+            <span class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-gray-800 text-base truncate max-w-[50%] text-center">Ürünler</span>
+            <div class="flex items-center gap-3 mobile-right-group shrink-0 z-10">
+                @if(isset($activeRestaurant) && $activeRestaurant->logo_url)
+                    <img src="{{ asset($activeRestaurant->logo_url) }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white" alt="Restaurant Logo">
+                @else
+                    <img src="{{ asset('images/oztaylan_logo.jpg') }}" class="h-10 w-10 object-contain rounded-lg border border-gray-100 bg-white mix-blend-multiply" alt="Restaurant Logo">
+                @endif
+            </div>
         </header>
 
         <header
             class="hidden md:flex h-20 bg-white/80 backdrop-blur-md items-center justify-between px-8 shadow-sm z-10 shrink-0">
-            <h2 class="text-xl font-semibold text-gray-800">Ürün Yönetimi</h2>
-            <div class="flex items-center gap-4">
+            <h2 class="text-xl font-semibold text-gray-800">Ürünler</h2>
+            <div class="flex items-center gap-3 border-l border-gray-100 pl-3">
                 <div
-                    class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-bold border-2 border-[#8C6C47]">
+                    class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-bold border-2 border-[#8C6C47] shrink-0">
                     {{ mb_substr(optional(Auth::user())->full_name ?? optional(Auth::user())->name ?? 'A', 0, 1, 'UTF-8') }}
+                </div>
+                <div class="hidden sm:block text-sm text-left">
+                    <p class="font-bold text-gray-800">{{ optional(Auth::user())->full_name ?? optional(Auth::user())->name ?? 'Yönetici' }}</p>
+                    <p class="text-xs text-gray-500">Admin</p>
                 </div>
             </div>
         </header>
@@ -177,6 +184,23 @@
                             class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm"
                             placeholder="İçindekiler..."></textarea>
                     </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Ürün Sıra No (Opsiyonel)</label>
+                            <input type="number" name="sort_order" placeholder="Örn: 1"
+                                class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Tavsiye Sıra No</label>
+                            <input type="number" name="recommended_sort_order" placeholder="Örn: 1"
+                                class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Alerjen Bilgisi (Opsiyonel)</label>
+                        <input type="text" name="allergen_info" placeholder="Örn: Glüten, Süt, Fıstık vb."
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm">
+                    </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Görsel</label>
                         <input type="file" name="image" accept="image/*"
@@ -185,6 +209,10 @@
                     <label class="flex items-center gap-2 cursor-pointer mt-2">
                         <input type="checkbox" name="is_gluten_free" value="1" class="w-4 h-4 accent-[#8C6C47]">
                         <span class="text-sm font-medium text-gray-700">Bu ürün Glutensiz (GF)</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer mt-1">
+                        <input type="checkbox" name="is_recommended" value="1" class="w-4 h-4 accent-[#8C6C47]">
+                        <span class="text-sm font-medium text-gray-700">Tavsiye Edilen Ürün</span>
                     </label>
                     <button type="submit"
                         class="w-full bg-[#1C1C1C] text-white font-medium py-3 rounded-xl hover:bg-[#8C6C47] transition-colors mt-4">Kaydet</button>
@@ -231,6 +259,23 @@
                         <textarea id="edit-product-desc" name="description" rows="2"
                             class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm"></textarea>
                     </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Ürün Sıra No</label>
+                            <input type="number" id="edit-product-sort-order" name="sort_order" placeholder="Örn: 1"
+                                class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Tavsiye Sıra No</label>
+                            <input type="number" id="edit-product-rec-sort" name="recommended_sort_order" placeholder="Örn: 1"
+                                class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Alerjen Bilgisi</label>
+                        <input type="text" id="edit-product-allergen" name="allergen_info" placeholder="Örn: Glüten, Süt, Fıstık vb."
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm">
+                    </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Yeni Görsel</label>
                         <input type="file" name="image" accept="image/*"
@@ -240,6 +285,11 @@
                         <input type="checkbox" id="edit-product-gf" name="is_gluten_free" value="1"
                             class="w-4 h-4 accent-[#8C6C47]">
                         <span class="text-sm font-medium text-gray-700">Bu ürün Glutensiz (GF)</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer mt-1">
+                        <input type="checkbox" id="edit-product-rec" name="is_recommended" value="1"
+                            class="w-4 h-4 accent-[#8C6C47]">
+                        <span class="text-sm font-medium text-gray-700">Tavsiye Edilen Ürün</span>
                     </label>
                     <button type="submit"
                         class="w-full bg-[#8C6C47] text-white font-medium py-3.5 rounded-xl transition-colors mt-2">Değişiklikleri
@@ -271,6 +321,10 @@
             document.getElementById('edit-product-prep-time').value = product.prep_time || 15;
             document.getElementById('edit-product-desc').value = product.description;
             document.getElementById('edit-product-gf').checked = product.is_gluten_free == 1;
+            document.getElementById('edit-product-sort-order').value = product.sort_order || '';
+            document.getElementById('edit-product-rec').checked = product.is_recommended == 1;
+            document.getElementById('edit-product-rec-sort').value = product.recommended_sort_order || 0;
+            document.getElementById('edit-product-allergen').value = product.allergen_info || '';
 
             const modal = document.getElementById('edit-product-modal');
             modal.classList.remove('hidden');

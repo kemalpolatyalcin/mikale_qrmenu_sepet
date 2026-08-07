@@ -507,6 +507,45 @@
             </button>
         </nav>
 
+        <div id="waiter-modal" class="fixed inset-0 z-[150] hidden items-center justify-center p-4">
+            <div id="waiter-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300" onclick="closeWaiterModal()"></div>
+            <div id="waiter-dialog" class="bg-white rounded-3xl p-6 w-full max-w-sm relative z-10 shadow-2xl transform scale-95 opacity-0 transition-all duration-300 flex flex-col items-center text-center font-sans">
+                <div class="w-16 h-16 rounded-full bg-amber-50 text-[#8C6C47] flex items-center justify-center mb-4 text-2xl animate-bounce">
+                    <i class="fa-solid fa-bell-concierge"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-1">Garson Çağır</h3>
+                <p class="text-xs text-gray-400 mb-4">Lütfen çağırma nedeninizi seçin:</p>
+                
+                <div class="grid grid-cols-2 gap-3 mb-6 w-full">
+                    <button onclick="selectWaiterReason('Servis / Çatal Bıçak')" id="reason-service" class="waiter-reason-btn flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-[#8C6C47] bg-amber-50/20 text-[#8C6C47] transition-all gap-1.5 outline-none select-none">
+                        <i class="fa-solid fa-utensils text-lg"></i>
+                        <span class="text-[11px] font-bold">Servis / Çatal Bıçak</span>
+                    </button>
+                    <button onclick="selectWaiterReason('Hesap İstemek')" id="reason-bill" class="waiter-reason-btn flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-gray-150 bg-white text-gray-700 transition-all gap-1.5 outline-none select-none">
+                        <i class="fa-solid fa-credit-card text-lg text-emerald-600"></i>
+                        <span class="text-[11px] font-bold">Hesap İstemek</span>
+                    </button>
+                    <button onclick="selectWaiterReason('Masa Temizliği')" id="reason-clean" class="waiter-reason-btn flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-gray-150 bg-white text-gray-700 transition-all gap-1.5 outline-none select-none">
+                        <i class="fa-solid fa-broom text-lg text-amber-500"></i>
+                        <span class="text-[11px] font-bold">Masa Temizliği</span>
+                    </button>
+                    <button onclick="selectWaiterReason('Soru / Yardım')" id="reason-help" class="waiter-reason-btn flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-gray-150 bg-white text-gray-700 transition-all gap-1.5 outline-none select-none">
+                        <i class="fa-solid fa-circle-question text-lg text-blue-500"></i>
+                        <span class="text-[11px] font-bold">Soru / Yardım</span>
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-3 w-full">
+                    <button onclick="closeWaiterModal()" class="flex-1 py-3 border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold rounded-xl transition-colors text-sm">
+                        Vazgeç
+                    </button>
+                    <button onclick="confirmCallWaiter()" class="flex-1 py-3 bg-[#8C6C47] hover:bg-[#735738] text-white font-bold rounded-xl shadow-md transition-colors text-sm">
+                        Onayla
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div id="overlay" class="overlay" onclick="closeProductModal()"></div>
         <div id="product-modal" class="modal-container shadow-2xl">
             <div class="relative w-full h-56 md:h-64 shrink-0 bg-gray-50">
@@ -557,6 +596,8 @@
             </div>
         </div>
     </div>
+
+    <livewire:cart-drawer />
 
     @livewireScripts
 
@@ -1052,6 +1093,17 @@
             document.getElementById('modal-cal').innerHTML = `<i class="fa-solid fa-fire text-orange-400 mr-1"></i> ${product.calories || 0} kcal`;
             document.getElementById('modal-time').innerHTML = `<i class="fa-regular fa-clock mr-1 text-gray-400"></i> ${product.prep_time || 15} dk`;
 
+            const allergenContainer = document.getElementById('modal-allergen-container');
+            const allergenDisplay = document.getElementById('modal-allergen');
+            if (product.allergen_info && product.allergen_info.trim() !== '') {
+                allergenDisplay.innerText = product.allergen_info;
+                allergenContainer.classList.remove('hidden');
+                allergenContainer.classList.add('flex');
+            } else {
+                allergenContainer.classList.remove('flex');
+                allergenContainer.classList.add('hidden');
+            }
+
 
 
             document.getElementById('overlay').classList.add('open');
@@ -1128,7 +1180,59 @@
 
         });
 
+        let selectedWaiterReason = 'Servis / Çatal Bıçak';
+
+        function selectWaiterReason(reason) {
+            selectedWaiterReason = reason;
+            const btns = document.querySelectorAll('.waiter-reason-btn');
+            btns.forEach(btn => {
+                btn.className = 'waiter-reason-btn flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-gray-150 bg-white text-gray-700 transition-all gap-1.5 outline-none select-none';
+            });
+            
+            let targetId = 'reason-service';
+            if (reason === 'Hesap İstemek') targetId = 'reason-bill';
+            else if (reason === 'Masa Temizliği') targetId = 'reason-clean';
+            else if (reason === 'Soru / Yardım') targetId = 'reason-help';
+            
+            const activeBtn = document.getElementById(targetId);
+            if (activeBtn) {
+                activeBtn.className = 'waiter-reason-btn flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-[#8C6C47] bg-amber-50/20 text-[#8C6C47] transition-all gap-1.5 outline-none select-none';
+            }
+        }
+
         function callWaiter() {
+            selectWaiterReason('Servis / Çatal Bıçak');
+            const modal = document.getElementById('waiter-modal');
+            const backdrop = document.getElementById('waiter-backdrop');
+            const dialog = document.getElementById('waiter-dialog');
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            setTimeout(() => {
+                backdrop.classList.add('opacity-100');
+                dialog.classList.remove('scale-95', 'opacity-0');
+                dialog.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeWaiterModal() {
+            const modal = document.getElementById('waiter-modal');
+            const backdrop = document.getElementById('waiter-backdrop');
+            const dialog = document.getElementById('waiter-dialog');
+            
+            backdrop.classList.remove('opacity-100');
+            dialog.classList.remove('scale-100', 'opacity-100');
+            dialog.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function confirmCallWaiter() {
+            closeWaiterModal();
             const urlParams = new URLSearchParams(window.location.search);
             let tableToken = urlParams.get('masa') || urlParams.get('table') || 'Bilinmeyen Masa';
 
@@ -1139,12 +1243,15 @@
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({ table_token: tableToken })
+                body: JSON.stringify({ 
+                    table_token: tableToken,
+                    reason: selectedWaiterReason
+                })
             })
                 .then(res => res.json())
                 .then(data => {
                     if (data && data.status === 'success') {
-                        alert(translations[currentLang].waiterCalledSuccess || 'Garson çağırma talebi iletildi.');
+                        showSuccessToast(translations[currentLang].waiterCalledSuccess || 'Garson çağırma talebi iletildi.');
                     } else {
                         alert('Bir hata oluştu.');
                     }
@@ -1152,6 +1259,31 @@
                 .catch(() => {
                     alert('Bir hata oluştu.');
                 });
+        }
+
+        function showSuccessToast(message) {
+            let toast = document.getElementById('success-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'success-toast';
+                toast.className = 'fixed top-5 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-4 rounded-xl shadow-2xl z-[200] flex items-center gap-3 font-semibold min-w-[300px] justify-center transition-all duration-300 opacity-0 translate-y-[-20px]';
+                toast.innerHTML = `<i class="fa-solid fa-circle-check text-xl"></i><span id="success-toast-message"></span>`;
+                document.body.appendChild(toast);
+            }
+            document.getElementById('success-toast-message').innerText = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.remove('opacity-0', 'translate-y-[-20px]');
+                toast.classList.add('opacity-100', 'translate-y-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-[-20px]');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 300);
+            }, 4000);
         }
     </script>
 </body>

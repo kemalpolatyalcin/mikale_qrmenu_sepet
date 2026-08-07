@@ -134,20 +134,30 @@ new class extends Component {
         foreach ($allTables as $table) {
             $tableOrders = $activeOrders->where('table_number', $table->name);
             $totalAmount = $tableOrders->sum('total_amount');
+            $hasWaiterCall = false;
+            foreach ($tableOrders as $o) {
+                if (str_contains(mb_strtolower($o->order_note ?? '', 'UTF-8'), 'garson')) {
+                    $hasWaiterCall = true;
+                    break;
+                }
+            }
             $tablesData[] = [
                 'id' => $table->id,
                 'name' => $table->name,
                 'token' => $table->token,
                 'total_amount' => $totalAmount,
-                'has_active' => $totalAmount > 0,
+                'has_active' => $totalAmount > 0 || $hasWaiterCall,
+                'has_waiter_call' => $hasWaiterCall,
                 'orders' => $tableOrders
             ];
         }
 
         if ($this->searchQuery !== '') {
-            $q = $this->searchQuery;
+            $q = mb_strtolower($this->searchQuery, 'UTF-8');
             $tablesData = array_filter($tablesData, function ($t) use ($q) {
-                return str_contains(strtolower($t['name']), strtolower($q)) || str_contains(strtolower($t['token']), strtolower($q));
+                $name = mb_strtolower($t['name'], 'UTF-8');
+                $token = mb_strtolower($t['token'] ?? '', 'UTF-8');
+                return str_contains($name, $q) || str_contains($token, $q);
             });
         }
 
@@ -245,6 +255,8 @@ new class extends Component {
                     class="px-4 py-2 bg-[#8C6C47] hover:bg-[#735738] border border-[#8C6C47]/20 rounded-xl text-sm font-semibold text-white transition-colors flex items-center gap-2 whitespace-nowrap shadow-sm">
                     <i class="fa-solid fa-rotate"></i> Bağlantıyı Yenile
                 </button>
+
+
             </div>
         </header>
 
@@ -331,11 +343,15 @@ new class extends Component {
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             @forelse($tables as $t)
                 <button wire:click="selectTable('{{ $t['name'] }}')" class="flex flex-col justify-between p-5 rounded-2xl border text-left transition-all duration-200 outline-none
-                    {{ $t['has_active'] ? 'bg-[#8C6C47]/10 border-[#8C6C47]/40 hover:bg-[#8C6C47]/20 shadow-sm' : 'bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50/50 shadow-sm' }}
+                    {{ $t['has_waiter_call'] ? 'bg-red-50/50 border-red-200 hover:bg-red-50 shadow-sm' : ($t['has_active'] ? 'bg-[#8C6C47]/10 border-[#8C6C47]/40 hover:bg-[#8C6C47]/20 shadow-sm' : 'bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50/50 shadow-sm') }}
                 ">
                     <div class="flex justify-between items-start w-full">
                         <span class="text-lg font-bold text-gray-800 tracking-wide">{{ $t['name'] }}</span>
-                        @if($t['has_active'])
+                        @if($t['has_waiter_call'])
+                            <span class="flex items-center gap-1 bg-red-500 text-white px-2 py-0.5 rounded-full text-[9px] font-extrabold border border-red-600/10 animate-pulse">
+                                <i class="fa-solid fa-bell-concierge"></i> Çağrı
+                            </span>
+                        @elseif($t['has_active'])
                             <span class="w-2.5 h-2.5 rounded-full bg-[#8C6C47] animate-pulse"></span>
                         @else
                             <span class="text-[9px] uppercase font-bold text-gray-400 tracking-wider">Boş</span>
@@ -343,7 +359,22 @@ new class extends Component {
                     </div>
 
                     <div class="mt-8">
-                        @if($t['has_active'])
+                        @if($t['has_waiter_call'])
+                            <span class="text-xs text-red-600 font-semibold block mb-0.5">Garson Çağrısı:</span>
+                            <span class="text-sm font-bold text-gray-900 truncate block">
+                                @php
+                                    $wOrder = $t['orders']->first();
+                                    $noteVal = $wOrder ? $wOrder->order_note : '';
+                                    if (strpos($noteVal, '(') !== false && strpos($noteVal, ')') !== false) {
+                                        $start = strpos($noteVal, '(') + 1;
+                                        $len = strpos($noteVal, ')') - $start;
+                                        echo substr($noteVal, $start, $len);
+                                    } else {
+                                        echo 'Genel Çağrı';
+                                    }
+                                @endphp
+                            </span>
+                        @elseif($t['has_active'])
                             <span class="text-xs text-[#8C6C47] font-semibold block mb-0.5">Aktif Hesap:</span>
                             <span class="text-xl font-black text-gray-950">₺{{ number_format($t['total_amount'], 2) }}</span>
                         @else
